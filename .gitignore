@@ -1,0 +1,42 @@
+# --- Zugangsdaten & Tokens: NIE versionieren ---
+.env
+.env.*
+*.token
+*_tokens.json
+garmin_tokens.json
+oauth1_token.json
+oauth2_token.json
+.garminconnect/
+.garmin-mcp/
+.claude/settings.local.json
+.mcp.json
+
+# --- Exportierte Rohdaten (persönliche Gesundheitsdaten) ---
+data/
+!data/garmin/.gitkeep
+*.fit
+*.FIT
+*.tcx
+*.gpx
+
+# --- Python / uv ---
+__pycache__/
+*.pyc
+.venv/
+venv/
+.uv-cache/
+uv.lock
+.pytest_cache/
+.ruff_cache/
+
+# --- Node ---
+node_modules/
+npm-debug.log*
+
+# --- OS / Editor ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
