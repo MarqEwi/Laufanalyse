@@ -92,6 +92,8 @@ uv run scripts\garmin_export.py --id 19876543210 --recovery-hr 135
 uv run scripts\garmin_export.py --fit lauf.fit
 uv run scripts\garmin_export.py --list 5           # letzte 5 Aktivitäten
 uv run scripts\garmin_export.py --exported         # gesicherte Läufe auflisten
+uv run scripts\garmin_workout.py create workouts\indoor_cycling_nxt_lvl.json --dry-run   # Workout prüfen
+uv run scripts\garmin_workout.py create workouts\indoor_cycling_nxt_lvl.json             # ... und hochladen
 ```
 
 ## Dateien
@@ -106,6 +108,8 @@ uv run scripts\garmin_export.py --exported         # gesicherte Läufe auflisten
 | `scripts/garmin_export.py` | Export + Analyse als CLI, FIT-Fallback |
 | `scripts/garmin_login.py` | Anmeldung mit MFA (Terminal oder `--mfa-file`), `--show-token` |
 | `scripts/garmin_auth.py` | gemeinsame Anmeldung (Env-Variablen, Token-Ordner, Token aus `GARMIN_TOKENS_B64`) |
+| `scripts/garmin_workout.py` | Workouts in Garmin Connect anlegen (`create spec.json [--schedule DATUM] [--dry-run]`), anzeigen (`list`, `show`), terminieren (`schedule`), löschen (`delete`); Spezifikation als JSON, Beispiele in `workouts/` |
+| `workouts/*.json` | Workout-Vorlagen (Schritte mit Dauer/Distanz und Ziel: HF-Bereich, HF-Zone oder Pace) |
 | `scripts/setup-garmin-mcp.ps1` | Windows-Einrichtung |
 | `docs/garmin-tools.md` | Tools, Parameter, Datenfelder, Einschränkungen |
 | `data/garmin/<datum>_<id>/` | `summary.md`, `analysis.json`, `laps.csv/json`, `timeseries.csv`, `raw/*.json` (nicht versioniert) |

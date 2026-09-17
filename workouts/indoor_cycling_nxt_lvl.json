@@ -1,0 +1,9 @@
+{
+  "name": "Indoor Cycling NXT LVL",
+  "sport": "cycling",
+  "description": "Coach Engelhardt 16.09.2026: Easy Bike, optional 90-120 min, HF unter 130. Teil 2 bei Bedarf mit Rundentaste beenden.",
+  "steps": [
+    {"type": "interval", "duration_s": 5400, "target": {"hr_bpm": [90, 130]}, "note": "Easy Bike 90 min, HF unter 130"},
+    {"type": "interval", "duration_s": 1800, "target": {"hr_bpm": [90, 130]}, "note": "Optional bis 120 min, Rundentaste = fertig"}
+  ]
+}

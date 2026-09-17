@@ -90,6 +90,26 @@ s/km + `pace_str` „m:ss“, `duration_str`).
 | `get_user_profile` | – | Profil/Einheiten |
 | `login_status` | – | Token-Ordner, gesetzte Variablen, Anmeldung ok/Fehlertext |
 
+## 3a. Workouts anlegen (`scripts/garmin_workout.py`)
+
+`python-garminconnect` kann Workouts hochladen (`upload_workout`, JSON wie Garmin Connect es liefert), im
+Kalender terminieren (`schedule_workout(id, "YYYY-MM-DD")`) und löschen (`delete_workout`). Das Skript baut das
+JSON aus einer kurzen Spezifikation (siehe Docstring, Beispiele in `workouts/`). Geprüft am 17.09.2026 an den
+vorhandenen Workouts des Kontos:
+
+| Element | Garmin-JSON |
+|---|---|
+| Sportart | `sportType` `{sportTypeId, sportTypeKey}`: running=1, cycling=2, other=3 (Rudern), swimming=4, walking=9 |
+| Schritt | `ExecutableStepDTO` mit `stepType` (warmup=1, cooldown=2, interval=3, recovery=4, rest=5), `endCondition` (lap.button=1, time=2 in s, distance=3 in m), `targetType` |
+| Ziel HF-Bereich | `heart.rate.zone` (id 4) mit `targetValueOne`/`targetValueTwo` in bpm, `zoneNumber` null |
+| Ziel HF-Zone | `heart.rate.zone` mit `zoneNumber` 1–5, Werte null |
+| Ziel Pace | `pace.zone` (id 6) mit `targetValueOne` = schnellere, `targetValueTwo` = langsamere Geschwindigkeit in m/s (4:32 min/km = 3,676 m/s) |
+| Wiederholung | `RepeatGroupDTO` mit `numberOfIterations`, `endCondition` iterations=7, `workoutSteps` |
+
+Hinweis: In Claude-Code-Cloud-Sessions kann der Upload von der Berechtigungsprüfung als externer Schreibzugriff
+blockiert werden; dann `--dry-run` zur Kontrolle und den Upload am PC ausführen oder eine Bash-Regel für
+`uv run scripts/garmin_workout.py` in den Einstellungen freigeben.
+
 ## 4. Bekannte Einschränkungen
 
 1. Die Zeitreihe von Garmin ist bereits gesampelt (meist 1 s, bei „Smart Recording“ unregelmäßig).
