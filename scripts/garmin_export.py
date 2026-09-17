@@ -930,7 +930,10 @@ def main() -> int:
     else:
         import garmin_auth
 
-        client = garmin_auth.connect(interactive=sys.stdin.isatty())
+        try:
+            client = garmin_auth.connect(interactive=sys.stdin.isatty())
+        except Exception as exc:  # noqa: BLE001
+            raise SystemExit(f"Garmin-Anmeldung fehlgeschlagen: {exc}") from exc
         if args.list:
             print_activity_list(client, limit=args.list)
             return 0

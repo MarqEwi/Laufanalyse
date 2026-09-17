@@ -1,68 +1,97 @@
 # Garmin-Connect-Daten in Claude Code: Server, Tools, Parameter
 
-Stand: September 2026. Alle Angaben wurden am Quellcode der Pakete geprüft; die
-Live-Antworten der Garmin-API können je nach Uhr/Aktivität zusätzliche Felder enthalten.
+Stand: September 2026. Geprüft am Quellcode von `python-garminconnect` 0.3.15 und an den beiden
+Kandidaten-Servern; die Live-Antworten der Garmin-API können je nach Uhr/Aktivität zusätzliche Felder enthalten.
 
 ## 1. Welcher MCP-Server – und warum
 
+Anforderung: identisch nutzbar auf dem Windows-PC **und** in Claude-Code-Cloud-Sessions (Smartphone,
+claude.ai/code). Cloud-Sessions laufen in einem frischen Linux-Container: kein Windows-User-Scope, kein
+Token-Cache, keine interaktive MFA-Abfrage.
+
 | Kandidat | Ergebnis |
 |---|---|
-| `@nicolasvegam/garmin-connect-mcp` (npm, v1.1.1 vom 15.02.2026) | **Nicht genommen.** Der Server nutzt den alten Garmin-Login (SSO-Widget → Ticket → OAuth1/OAuth2, wie `garth`). Garmin hat diesen Weg im März 2026 umgestellt; `garth` wurde deshalb am 27.03.2026 als „deprecated“ eingestellt. Außerdem kann der Server **kein MFA** (offenes Issue #11 „Not prompted for MFA code“, Login-Fehler „invalid credentials or MFA required“). |
-| `mcp-garmin` (PyPI, v0.3.0, via `uvx`) | **Genommen.** Baut auf `python-garminconnect` ≥ 0.3 auf, das den aktuellen Garmin-Login (DI-OAuth2-Token, mehrere Login-Strategien inkl. Cloudflare-tauglichem `curl_cffi`) und eine **MFA-Abfrage** unterstützt. Token-Cache mit automatischer Erneuerung. Nachteil: braucht Python ≥ 3.14 (uv lädt es automatisch) und ein Tool ist fehlerhaft (siehe 4.). |
+| `@nicolasvegam/garmin-connect-mcp` (npm, v1.1.1 vom 15.02.2026) | **Nicht genommen.** Nutzt den alten Garmin-Login (SSO-Widget → Ticket → OAuth1/OAuth2 wie `garth`). Garmin hat diesen Weg im März 2026 umgestellt; `garth` wurde deshalb am 27.03.2026 eingestellt. Außerdem **kein MFA** (offenes Issue #11, Fehler „invalid credentials or MFA required“). |
+| `mcp-garmin` (PyPI, v0.3.0, `uvx`) | **Nicht genommen, obwohl der Login funktioniert.** Braucht Python ≥ 3.14; das `uv` im Cloud-Container kennt nur Python 3.14.0rc2, mit dem der Server wegen einer pydantic-Inkompatibilität abstürzt (im Container reproduziert). Zwei weitere Fehler: `get_activity_details` ruft die Bibliothek mit `maxchart=0` auf (→ `ValueError`, Zeitreihe nicht abrufbar) und Tokens werden nur mit gesetztem `GARMINTOKENS` geladen/gespeichert. |
+| **`scripts/garmin_mcp_server.py` (eigener Server im Repo)** | **Genommen.** ~250 Zeilen auf Basis derselben Bibliothek `python-garminconnect` ≥ 0.3 (aktueller Garmin-Login mit DI-OAuth2-Token, mehrere Login-Strategien inkl. Cloudflare-tauglichem `curl_cffi`, MFA-Unterstützung). Python ≥ 3.11, Start mit `uv run` (Abhängigkeiten per PEP 723 automatisch). Läuft in Cloud-Container (getestet), auf Windows und macOS gleich. Liefert kompakte, normalisierte Daten statt roher JSON-Berge und enthält `analyze_run`, das die komplette Sicherung + Auswertung in einem Aufruf macht. |
 
-Start im Container geprüft: `uvx --python 3.14 mcp-garmin` meldet 32 Tools (mcp 1.30.0, garminconnect 0.3.15).
+Registrierung:
 
-## 2. Anmeldung, MFA und Token-Cache
+- **Im Repo** (gilt auf jedem Gerät, auch in der Cloud): `.mcp.json` → `uv run scripts/garmin_mcp_server.py`; `.claude/settings.json` gibt Projekt-Server automatisch frei.
+- **PC, User-Scope** (für andere Projekte): `claude mcp add garmin -s user -e GARMINTOKENS=… -- uv run <repo>\scripts\garmin_mcp_server.py` (macht das Setup-Skript).
 
-- Zugangsdaten nur als **Umgebungsvariablen**: `GARMIN_EMAIL`, `GARMIN_PASSWORD`. Sie werden vom Setup-Skript als Windows-Benutzervariablen gesetzt (Registry, keine Datei im Repo).
-- `GARMINTOKENS` zeigt auf den Token-Ordner (Standard `%USERPROFILE%\.garminconnect`). **Wichtig:** `garminconnect` lädt und speichert Tokens nur, wenn dieser Pfad gesetzt ist. Ohne ihn würde `mcp-garmin` bei jedem Start ein Passwort-Login machen und an MFA scheitern. Deshalb wird `GARMINTOKENS` beim `claude mcp add` mit `-e` übergeben.
-- Ablauf: Erstanmeldung mit `scripts/garmin_login.py` (fragt Passwort ohne Echo und den MFA-Code ab) → Datei `garmin_tokens.json` (DI-Access-Token + Refresh-Token + Client-ID). Danach lädt jeder Start die Tokens; das Access-Token wird bei Ablauf (JWT-`exp`, 15-Minuten-Puffer) automatisch per Refresh-Token erneuert – ohne Passwort und ohne MFA.
-- Neu anmelden ist nur nötig, wenn Garmin das Refresh-Token ungültig macht (Passwortänderung, Sitzungswiderruf, längere Inaktivität). Symptom: Tool-Antwort „Authentication failed … Run mcp-garmin-login“. Lösung: `uv run scripts/garmin_login.py --force`.
-- Bei „429 Too Many Requests“ einige Minuten warten; nicht wiederholt einloggen.
-- `mcp-garmin` verlangt `GARMIN_EMAIL`/`GARMIN_PASSWORD` auch dann, wenn Tokens gültig sind (reine Vollständigkeitsprüfung beim Start).
+## 2. Anmeldung, MFA und Token-Cache auf allen Geräten
 
-## 3. MCP-Tools des Servers `garmin` (mcp-garmin 0.3.0)
+Garmin verwendet seit 2026 DI-OAuth2-Tokens: ein kurzlebiges Access-Token (JWT mit `exp`) und ein
+Refresh-Token. `garminconnect` erneuert das Access-Token automatisch (15-Minuten-Puffer), ohne Passwort und
+ohne MFA. Ein neues Login (mit MFA) ist nur nötig, wenn das Refresh-Token ungültig wird (Passwortänderung,
+Sitzungswiderruf, längere Nichtnutzung, evtl. Rotation durch Garmin).
 
-Namen in Claude Code: `mcp__garmin__<tool>`. Rückgabe ist immer das rohe Garmin-JSON.
+| Variable | Zweck |
+|---|---|
+| `GARMIN_EMAIL`, `GARMIN_PASSWORD` | Nur für ein Passwort-Login nötig (keine Tokens). PC: Benutzer-Umgebungsvariablen (Registry), Cloud: Umgebungsvariablen der Cloud-Umgebung. |
+| `GARMINTOKENS` | Token-Ordner (Standard `~/.garminconnect`). Datei `garmin_tokens.json` = `{di_token, di_refresh_token, di_client_id}`. |
+| `GARMIN_TOKENS_B64` (oder `GARMIN_TOKENS_JSON`) | Token-Inhalt als base64/JSON für Umgebungen ohne dauerhaften Ordner (Cloud). Wird beim Start in den Token-Ordner geschrieben. Erzeugen: `uv run scripts/garmin_login.py --show-token`. |
+| `LAUFANALYSE_DATA_DIR` | Ausgabeordner (Standard `./data/garmin`). |
+
+Abläufe:
+
+1. **PC (einmalig):** `uv run scripts/garmin_login.py` → Passwort ohne Echo, MFA-Code → Tokens in `%USERPROFILE%\.garminconnect`.
+2. **Cloud/Smartphone:** Token vom PC übertragen: `--show-token` → Wert als `GARMIN_TOKENS_B64` in der Cloud-Umgebung (claude.ai/code → Umgebung bearbeiten → Umgebungsvariablen). Jede Session schreibt ihn beim Start in den Token-Ordner (Session-Start-Hook oder beim ersten Tool-Aufruf).
+3. **MFA direkt in einer Cloud-Session** (wenn die Tokens abgelaufen sind und kein PC greifbar ist): `uv run scripts/garmin_login.py --mfa-file /tmp/mfa.txt` im Hintergrund starten; das Skript wartet bis zu 5 Minuten auf die Datei; Claude schreibt den vom Nutzer genannten Code mit `echo 123456 > /tmp/mfa.txt`. Danach `--show-token` und `GARMIN_TOKENS_B64` in der Umgebung aktualisieren. Voraussetzung: `GARMIN_EMAIL`/`GARMIN_PASSWORD` in der Umgebung, Netzwerk auf `*.garmin.com` freigegeben.
+
+Garmin bremst wiederholte Logins mit „429 Too Many Requests“ – deshalb Tokens immer wiederverwenden und
+nach 429 einige Minuten warten. Login aus Rechenzentrums-IPs (Cloud) kann von Cloudflare blockiert werden;
+die Bibliothek probiert fünf Strategien, sicherer ist aber immer der Token-Transfer vom PC.
+
+## 3. Tools des MCP-Servers `garmin`
+
+Namen in Claude Code: `mcp__garmin__<tool>`. Rückgabe: normalisiertes JSON (Distanzen m, Zeiten s, Pace
+s/km + `pace_str` „m:ss“, `duration_str`).
 
 ### Aktivitäten finden
 
-| Tool | Parameter | Liefert |
-|---|---|---|
-| `get_activities` | `start` (int, 0), `limit` (int, 20) | Liste neuester Aktivitäten (alle Sportarten), flach: `activityId`, `activityName`, `activityType.typeKey` (z. B. `running`, `trail_running`), `startTimeLocal`, `distance` (m), `duration` (s), `averageSpeed` (m/s), `averageHR`, `maxHR`, `averageRunningCadenceInStepsPerMinute`, `elevationGain`, `calories`, `aerobicTrainingEffect` … |
-| `get_activities_by_date` | `start_date`, `end_date` (YYYY-MM-DD), `activity_type` (optional, z. B. `running`) | wie oben, Zeitraum-gefiltert |
-| `get_last_activity` | – | Liste mit der neuesten Aktivität (egal welche Sportart) |
-| `get_activity` | `activity_id` (int) | Detail-Summary mit `summaryDTO` (`distance`, `duration`, `movingDuration`, `averageSpeed`, `averageHR`, `maxHR`, `averageRunCadence`, `elevationGain/Loss`, `startTimeLocal/GMT`, `trainingEffect`, `vO2MaxValue` …), `activityTypeDTO.typeKey`, `metadataDTO` |
+| Tool | Parameter | Liefert | Garmin-Endpunkt |
+|---|---|---|---|
+| `get_activities` | `start`=0, `limit`=10, `activity_type`? (z. B. `running`) | kompakte Liste: `activity_id`, `name`, `type`, `start_local`, `date`, `distance_km`, `duration_str`, `pace_str`, `avg_hr`, `max_hr`, `elev_gain_m`, `avg_cadence_spm` | `/activitylist-service/activities/search/activities` |
+| `get_activities_by_date` | `start_date`, `end_date` (YYYY-MM-DD), `activity_type`=`running` | wie oben | dito mit Datumsfilter |
+| `get_last_run` | – | neuester Lauf (`type` enthält `running`), kompakt | dito |
+| `get_activity` | `activity_id` | normalisierte Zusammenfassung (`distance_m`, `duration_s`, `pace_s_per_km`, `avg_hr`, `max_hr`, `avg_cadence_spm`, `elev_gain_m`, `elev_loss_m`, `calories`, `avg_power_w`, `aerobic_te`, `anaerobic_te`, `vo2max`, `start_local`, `start_gmt`) | `/activity-service/activity/{id}` (`summaryDTO`) |
 
 ### Detaildaten eines Laufs
 
-| Daten | Tool | Parameter | Inhalt | Status |
+| Daten | Tool | Parameter | Inhalt | Garmin-Endpunkt / Bibliothek |
 |---|---|---|---|---|
-| **Laps/Splits** (Rundentaste, strukturierte Workouts) | `get_activity_splits` | `activity_id` | `lapDTOs[]`: `lapIndex`, `startTimeGMT`, `distance` (m), `duration` (s), `movingDuration`, `averageSpeed`/`maxSpeed` (m/s → Pace = 1000/v), `averageHR`, `maxHR`, `averageRunCadence`, `maxRunCadence`, `elevationGain/Loss`, `averagePower`, bei Workouts `intensityType` (`ACTIVE`/`REST`/`WARMUP`/`COOLDOWN`) und `wktStepIndex` | ✅ funktioniert |
-| **Sekunden-Zeitreihe** (HF, Geschwindigkeit, Höhe, Kadenz, Leistung) | `get_activity_details` | `activity_id` | `metricDescriptors[]` (Spaltenbeschreibung: `directTimestamp`, `sumDuration`, `sumDistance`, `directSpeed`, `directHeartRate`, `directElevation`, `directRunCadence`, `directPower`, …) + `activityDetailMetrics[].metrics[]` | ❌ **in mcp-garmin 0.3.0 defekt**: ruft die Bibliothek mit `maxchart=0` auf, `garminconnect` ≥ 0.3.2 wirft `ValueError: maxchart must be a positive integer`. → Zeitreihe über `scripts/garmin_export.py` holen (nutzt dieselbe Bibliothek direkt mit `maxchart=100000`). Auch unabhängig vom Fehler wäre eine 1-Hz-Zeitreihe (mehrere hundert KB JSON) im Chat-Kontext unbrauchbar. |
-| **HF-Zonen-Verteilung** | `get_activity_hr_zones` | `activity_id` | Liste `{zoneNumber, secsInZone, zoneLowBoundary}` für Zone 1–5 | ✅ |
-| **Wetter** | `get_activity_weather` | `activity_id` | `temp`, `apparentTemp`, `relativeHumidity`, `windSpeed`, `windDirectionCompassPoint`, `weatherTypeDTO.desc`, `issueDate` | ✅ – **Annahme:** `temp`/`apparentTemp` in °F, `windSpeed` in mph (das Export-Skript rechnet um und behält die Rohwerte in `weather.raw_*`; beim ersten echten Lauf gegen Garmin Connect prüfen). |
-| Ausrüstung | `get_activity_gear` | `activity_id` | Schuhe etc. | ✅ |
+| **Laps/Splits** (Rundentaste, strukturierte Workouts) | `get_activity_laps` | `activity_id` | je Lap: `nr`, `start_s`, `end_s`, `distance_m`, `duration_s`, `pace_s_per_km`/`pace_str`, `avg_hr`, `max_hr`, `avg_cadence_spm`, `elev_gain_m`, `avg_power_w`, `intensity` (bei Workouts `active`/`rest`/`warmup`/`cooldown`), `workout_step` | `/activity-service/activity/{id}/splits` → `lapDTOs[]` (`get_activity_splits`) |
+| Workout-Struktur | `get_activity_typed_splits` | `activity_id` | Rohdaten | `/typedsplits` (`get_activity_typed_splits`) |
+| **Sekunden-Zeitreihe** (HF, Geschwindigkeit/Pace, Höhe, Kadenz, Leistung) | `get_activity_timeseries` | `activity_id`, `step_s`=10, `max_chart`=100000 | ausgedünnte Zeilen `t_s`, `distance_m`, `hr`, `pace_s_per_km`, `elev_m`, `cadence_spm`, `power_w` + `points_total`. Vollauflösung schreibt `analyze_run` nach `timeseries.csv`. | `/activity-service/activity/{id}/details?maxChartSize=…` → `metricDescriptors` (`directTimestamp`, `sumDuration`, `sumDistance`, `directSpeed`, `directHeartRate`, `directElevation`, `directRunCadence`, `directPower`, …) + `activityDetailMetrics[].metrics[]` (`get_activity_details(id, maxchart, maxpoly)`) |
+| **HF-Zonen-Verteilung** | `get_activity_hr_zones` | `activity_id` | `zone`, `low_bpm`, `seconds`, `minutes`, `percent` (Zonen 1–5) | `/hrTimeInZones` (`get_activity_hr_in_timezones`) |
+| **Wetter** | `get_activity_weather` | `activity_id` | `temp_c`, `feels_like_c`, `humidity_pct`, `wind_kmh`, `wind_dir`, `condition` + `raw` | `/weather` (`get_activity_weather`). **Annahme:** Garmin liefert `temp`/`apparentTemp` in °F, `windSpeed` in mph → umgerechnet, Rohwerte bleiben erhalten; beim ersten echten Lauf gegen Garmin Connect prüfen. |
 
-Nicht als MCP-Tool vorhanden, aber vom Export-Skript direkt über die Bibliothek genutzt:
+### Komplettanalyse und Sicherung
 
-| Bibliotheksaufruf (`garminconnect.Garmin`) | Zweck |
-|---|---|
-| `get_activity_typed_splits(id)` | `/typedsplits` – Intervall-Struktur strukturierter Workouts (wird in `raw/typed_splits.json` abgelegt) |
-| `get_activity_details(id, maxchart=100000, maxpoly=1)` | vollständige Zeitreihe |
-| `download_activity(id, dl_fmt=ORIGINAL)` | Original-FIT als ZIP (nicht im Skript aktiv, für spätere Erweiterung) |
+| Tool | Parameter | Wirkung |
+|---|---|---|
+| `analyze_run` | `activity_id`? , `date`? (beides leer = letzter Lauf), `recovery_hr`=140, `work_factor`=0.93, `min_lap_km`=0.2, `out_dir`? | holt Summary, Laps, Zeitreihe, Zonen, Wetter; schreibt `<out>/<datum>_<id>/` (siehe 5.); liefert `output_dir`, `summary_md` (Bericht Abschnitte 1–4), `analysis` (Laps mit `type`, `hr_start`, `hr_end`, `hr_rise`, `recovery_to_threshold_s`; `intervals`; `hr_zones`; `notes`) |
+| `analyze_fit` | `fit_path`, sonst wie oben | dasselbe aus einer FIT-/ZIP-Datei (Fallback ohne API, ohne Wetter) |
+| `list_exported` | `out_dir`? | gesicherte Läufe mit Kennzahlen (für Vergleiche ohne API) |
 
-### Weitere nützliche Tools (Kontext für die Analyse)
+### Kontext und Status
 
-`get_training_status(date)`, `get_training_readiness(date)`, `get_hrv_data(date)`, `get_sleep_data(date)`, `get_resting_heart_rate(date)`, `get_max_metrics(date)` (VO2max), `get_personal_records()`, `get_workouts()` / `get_workout(workout_id)`, `get_user_profile()`, `get_daily_summary(date)`, `get_body_battery(date)`, `get_stress_data(date)`, `get_steps_data(date)`, `get_spo2_data(date)`, `get_respiration_data(date)`, `get_intensity_minutes(date)`, `get_body_composition(start_date,end_date)`, `get_weigh_ins(start_date,end_date)`, `get_fitness_age(date)`, `get_activity_exercise_sets(activity_id)`, `get_server_version()`.
+| Tool | Parameter | Inhalt |
+|---|---|---|
+| `get_training_context` | `date` | Trainingsstatus, Trainingsbereitschaft, HRV (ohne 5-Minuten-Rohwerte), Schlaf (`dailySleepDTO`), Ruhepuls |
+| `get_user_profile` | – | Profil/Einheiten |
+| `login_status` | – | Token-Ordner, gesetzte Variablen, Anmeldung ok/Fehlertext |
 
 ## 4. Bekannte Einschränkungen
 
-1. `get_activity_details` (MCP) ist defekt, s. o. Workaround: Export-Skript.
-2. Die Zeitreihe von Garmin ist bereits geglättet/gesampelt (meist 1 s, bei „Smart Recording“ unregelmäßig). Die Uhr-Rohdaten (FIT) haben dieselbe Auflösung.
-3. `intensityType` in den Laps ist nur bei strukturierten Workouts gesetzt; bei Rundentaste greift die Pace-Heuristik des Skripts.
-4. Wetter-Einheiten: Annahme °F/mph, siehe oben.
-5. Rate-Limits: Garmin blockt zu viele Logins (429). Tokens deshalb immer über `GARMINTOKENS` wiederverwenden.
+1. Die Zeitreihe von Garmin ist bereits gesampelt (meist 1 s, bei „Smart Recording“ unregelmäßig).
+2. `intensity` in den Laps ist nur bei strukturierten Workouts gesetzt; bei Rundentaste greift die Pace-Heuristik.
+3. Wetter-Einheiten: Annahme °F/mph (siehe oben).
+4. Rate-Limits und Cloudflare: Logins sparsam, Tokens wiederverwenden.
+5. In Cloud-Sessions ist `data/garmin/` nur für die Session vorhanden (Container wird verworfen, Ordner ist nicht versioniert). Langfristige Vergleiche: auf dem PC sichern oder Ordner selbst archivieren.
+6. Refresh-Token-Rotation: Erneuert Garmin das Refresh-Token, kann eine ältere Kopie in `GARMIN_TOKENS_B64` ungültig werden. Symptom: „Authentication failed“ in der Cloud, obwohl der PC funktioniert → auf dem PC `--show-token` neu ausführen und die Variable aktualisieren.
 
 ## 5. Datenstruktur des Exports (`data/garmin/<datum>_<id>/`)
 
@@ -74,4 +103,6 @@ Nicht als MCP-Tool vorhanden, aber vom Export-Skript direkt über die Bibliothek
 | `timeseries.csv` | `t_s, timestamp, distance_m, speed_m_s, pace_s_per_km, hr, elev_m, cadence_spm, power_w, gap_speed_m_s, temp_c` |
 | `raw/*.json` | unveränderte API-Antworten (`activity`, `splits`, `typed_splits`, `details`, `hr_zones`, `weather`) |
 
-FIT-Fallback (`--fit datei.fit`, auch ZIP aus dem Garmin-Connect-Export „Original“) erzeugt dieselbe Struktur; Wetter fehlt dann, HF-Zonen kommen aus `session.time_in_hr_zone` (Zonengrenzen nur, wenn `hr_zone`-Nachrichten in der Datei sind).
+FIT-Fallback (`analyze_fit` bzw. `garmin_export.py --fit`, auch ZIP aus Garmin Connect „Original exportieren“)
+erzeugt dieselbe Struktur; HF-Zonen kommen aus `session.time_in_hr_zone` (Zonengrenzen nur, wenn `hr_zone`-Nachrichten
+in der Datei sind).

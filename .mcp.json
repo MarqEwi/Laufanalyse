@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "garmin": {
+      "command": "uv",
+      "args": ["run", "scripts/garmin_mcp_server.py"]
+    }
+  }
+}

@@ -9,7 +9,6 @@ oauth2_token.json
 .garminconnect/
 .garmin-mcp/
 .claude/settings.local.json
-.mcp.json
 
 # --- Exportierte Rohdaten (persönliche Gesundheitsdaten) ---
 data/*

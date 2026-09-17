@@ -1,31 +1,38 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Richtet den Garmin-Connect-MCP-Server (mcp-garmin) und die Skill "laufanalyse" fuer Claude Code ein (Windows).
+  Richtet den Garmin-MCP-Server und die Skill "laufanalyse" fuer Claude Code auf dem Windows-PC ein
+  und erzeugt den Token-Wert fuer Cloud-Sessions (Smartphone / claude.ai/code).
 
 .DESCRIPTION
-  1. prueft uv und die Claude-CLI, stellt Python 3.14 fuer mcp-garmin bereit
+  1. prueft uv und die Claude-CLI
   2. fragt E-Mail und Passwort ab (Passwort ohne Anzeige) und legt sie als BENUTZER-Umgebungsvariablen ab
      (Registry HKCU\Environment, keine Datei im Repo)
-  3. meldet sich einmalig an (MFA-Code wird abgefragt) und legt den Token-Cache unter %USERPROFILE%\.garminconnect an
-  4. registriert den MCP-Server "garmin" im User-Scope von Claude Code
+  3. meldet sich einmalig an (MFA-Code wird abgefragt), Token-Cache unter %USERPROFILE%\.garminconnect,
+     Test: letzte 5 Aktivitaeten + Kennzahlen des letzten Laufs
+  4. registriert den MCP-Server "garmin" (scripts\garmin_mcp_server.py) im User-Scope von Claude Code,
+     damit er auch ausserhalb dieses Repos verfuegbar ist (im Repo greift zusaetzlich .mcp.json)
   5. kopiert die Skill nach %USERPROFILE%\.claude\skills\laufanalyse (User-Scope)
+  6. gibt den Wert fuer GARMIN_TOKENS_B64 aus (fuer die Cloud-Umgebung von Claude Code)
 
 .EXAMPLE
   powershell -ExecutionPolicy Bypass -File scripts\setup-garmin-mcp.ps1
   powershell -ExecutionPolicy Bypass -File scripts\setup-garmin-mcp.ps1 -SkipLogin   # nur MCP + Skill neu registrieren
+  powershell -ExecutionPolicy Bypass -File scripts\setup-garmin-mcp.ps1 -ShowTokenOnly # nur Token fuer die Cloud ausgeben
 #>
 param(
     [string]$Email = "marc.ewers@gmx.de",
     [switch]$SkipLogin,
     [switch]$SkipMcp,
-    [switch]$SkipSkill
+    [switch]$SkipSkill,
+    [switch]$ShowTokenOnly
 )
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 $TokenDir = Join-Path $env:USERPROFILE ".garminconnect"
 $DataDir  = Join-Path $RepoRoot "data\garmin"
+$Server   = Join-Path $RepoRoot "scripts\garmin_mcp_server.py"
 
 function Step($msg) { Write-Host ""; Write-Host "==> $msg" -ForegroundColor Cyan }
 function Need($cmd, $hint) {
@@ -34,14 +41,27 @@ function Need($cmd, $hint) {
         exit 1
     }
 }
+function ShowToken {
+    Step "Token fuer Cloud-Sessions (Smartphone, claude.ai/code)"
+    $env:GARMINTOKENS = $TokenDir
+    $blob = (uv run (Join-Path $RepoRoot "scripts\garmin_login.py") --show-token)
+    if ($LASTEXITCODE -ne 0) { Write-Host "Keine Tokens vorhanden - erst anmelden." -ForegroundColor Red; return }
+    Write-Host "In claude.ai/code -> Cloud-Umgebung bearbeiten -> Umgebungsvariablen eintragen:"
+    Write-Host ""
+    Write-Host "GARMIN_EMAIL=$Email"
+    Write-Host "GARMIN_TOKENS_B64=$blob"
+    Write-Host ""
+    Write-Host "Netzwerkzugriff der Umgebung auf 'Custom' stellen und '*.garmin.com' als erlaubte Domain eintragen."
+    try { Set-Clipboard -Value "GARMIN_TOKENS_B64=$blob"; Write-Host "(GARMIN_TOKENS_B64=... liegt in der Zwischenablage)" } catch {}
+}
 
 Step "Voraussetzungen pruefen"
 Need uv     "Installieren mit:  winget install --id astral-sh.uv -e   (danach neues Terminal oeffnen)"
 Need claude "Claude Code CLI nicht gefunden. Installation: https://code.claude.com/docs"
 Write-Host ("uv:     " + (uv --version))
 Write-Host ("claude: " + (claude --version))
-Write-Host "Python 3.14 fuer mcp-garmin bereitstellen (einmalig, uv laedt es herunter) ..."
-uv python install 3.14 | Out-Host
+
+if ($ShowTokenOnly) { ShowToken; exit 0 }
 
 Step "Zugangsdaten (werden NUR als Benutzer-Umgebungsvariablen gespeichert)"
 $emailIn = Read-Host "Garmin-E-Mail [$Email]"
@@ -77,12 +97,12 @@ if (-not $SkipLogin) {
 }
 
 if (-not $SkipMcp) {
-    Step "MCP-Server 'garmin' im User-Scope registrieren"
-    # Vorhandene Registrierung still entfernen
+    Step "MCP-Server 'garmin' im User-Scope registrieren (Abhaengigkeiten vorinstallieren)"
+    uv run $Server --warmup
     & claude mcp remove garmin -s user 2>$null | Out-Null
-    & claude mcp add garmin -s user -e "GARMINTOKENS=$TokenDir" -- uvx --python 3.14 mcp-garmin
+    & claude mcp add garmin -s user -e "GARMINTOKENS=$TokenDir" -e "LAUFANALYSE_DATA_DIR=$DataDir" -- uv run $Server
     Write-Host "Hinweis: GARMIN_EMAIL/GARMIN_PASSWORD kommen aus den Benutzer-Umgebungsvariablen."
-    Write-Host "         Claude Code muss aus einem NEUEN Terminal gestartet werden, damit es sie sieht."
+    Write-Host "         Claude Code aus einem NEUEN Terminal starten, damit es sie sieht."
     & claude mcp list
 }
 
@@ -91,15 +111,15 @@ if (-not $SkipSkill) {
     $SkillDst = Join-Path $env:USERPROFILE ".claude\skills\laufanalyse"
     New-Item -ItemType Directory -Force -Path (Join-Path $SkillDst "scripts") | Out-Null
     Copy-Item -Force (Join-Path $RepoRoot ".claude\skills\laufanalyse\SKILL.md") $SkillDst
-    foreach ($f in "garmin_auth.py", "garmin_export.py", "garmin_login.py") {
+    foreach ($f in "garmin_auth.py", "garmin_export.py", "garmin_login.py", "garmin_mcp_server.py") {
         Copy-Item -Force (Join-Path $RepoRoot "scripts\$f") (Join-Path $SkillDst "scripts")
     }
     Write-Host "Skill liegt in: $SkillDst  (Aufruf in Claude Code: /laufanalyse)"
 }
 
+ShowToken
+
 Step "Fertig"
-Write-Host "Naechste Schritte:"
-Write-Host "  1. Neues Terminal oeffnen (Umgebungsvariablen), dann 'claude' starten."
-Write-Host "  2. /mcp  -> Server 'garmin' muss 'connected' sein."
-Write-Host "  3. /laufanalyse  -> analysiert den letzten Lauf."
-Write-Host "Rohdaten landen in: $DataDir"
+Write-Host "PC:         neues Terminal, 'claude' starten, /mcp pruefen ('garmin' connected), /laufanalyse"
+Write-Host "Smartphone: Cloud-Umgebung mit den oben ausgegebenen Variablen + Netzwerk '*.garmin.com', dann Session auf diesem Repo starten"
+Write-Host "Rohdaten:   $DataDir"
