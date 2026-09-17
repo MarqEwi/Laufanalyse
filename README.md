@@ -114,6 +114,8 @@ uv run scripts\garmin_export.py --exported         # gesicherte Läufe auflisten
 
 - In Cloud-Sessions ist `data/garmin/` nur für die Dauer der Session vorhanden. Dauerhafte Sammlungen für Vergleiche über Wochen legst du auf dem PC an (oder du sicherst die Ordner selbst).
 - Erneuert Garmin das Refresh-Token, kann eine ältere Kopie in `GARMIN_TOKENS_B64` ungültig werden: dann auf dem PC `--show-token` neu ausführen und die Variable aktualisieren.
-- Wetter: Garmin liefert `temp` mutmaßlich in °F und `windSpeed` in mph; das Skript rechnet um und behält die Rohwerte. Beim ersten echten Lauf prüfen.
+- Wetter: Garmin liefert `temp` in °F und `windSpeed` in mph (bestätigt am 16.09.2026); das Skript rechnet um und behält die Rohwerte unter `raw`.
+- Leistung (`power_w`) fehlt ohne Leistungsquelle; `temp_c` in `timeseries.csv` ist der Uhrensensor, nicht die Lufttemperatur.
+- Erholungszeit bis HF < 140: Bei kurzen Pausen (40–50 s) wird die Schwelle meist nicht erreicht; der Bericht nennt, nach wie vielen Intervallen sie erreicht wurde.
 - Belastungs-/Erholungs-Erkennung ohne strukturiertes Workout ist eine Pace-Heuristik (`work_factor`, Standard 0.93).
 - Bei „429 Too Many Requests“ einige Minuten warten; Garmin bremst wiederholte Logins.

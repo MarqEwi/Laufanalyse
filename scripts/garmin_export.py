@@ -442,6 +442,11 @@ def classify_laps(laps: list[dict[str, Any]], overall_pace: float | None, work_f
         }
         for lap in laps:
             lap["type"] = mapping.get(lap.get("intensity") or "", "normal")
+            # Stummel (z. B. die letzten Meter nach dem Workout-Ende, intensity=active ohne workout_step)
+            # würden Streuung/Trend der Intervalle verfälschen -> nicht als Belastung werten.
+            if lap["type"] == "belastung" and (lap.get("distance_m") or 0) < min_lap_km * 1000:
+                lap["type"] = "normal"
+                lap["stub"] = True
         return "workout"
 
     # Heuristik: Laps nach Pace in eine schnelle und eine langsame Gruppe teilen (größte Lücke in der
@@ -573,11 +578,13 @@ def analyze(
                 else None,
                 "recovery_hr_threshold": recovery_hr,
                 "recovery_to_threshold_s_avg": round(statistics.fmean(rec)) if rec else None,
+                "recovery_to_threshold_reached": len(rec),
                 "recovery_to_threshold_s_list": [lap.get("recovery_to_threshold_s") for lap in work],
                 "recovery_lap_avg_hr": round(_mean([lap["avg_hr"] for lap in rest if lap.get("avg_hr") is not None]) or 0) or None,
             }
         )
         interval_stats["trend_text"] = _trend_text(pace_slope, hr_slope)
+        interval_stats["blocks"] = _interval_blocks(work)
 
     total_secs = sum(z["seconds"] for z in zones) or (summary.get("duration_s") or 0)
     zones_out = [
@@ -605,6 +612,38 @@ def analyze(
         "timeseries_columns": sorted({k for r in ts for k in r.keys()}),
         "notes": _data_notes(ts, zones, weather, laps),
     }
+
+
+def _interval_blocks(work: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Belastungs-Laps nach Garmin-Workout-Schritt gruppieren (bei Rundentaste: ein Block)."""
+    groups: dict[Any, list[dict[str, Any]]] = {}
+    for lap in work:
+        groups.setdefault(lap.get("workout_step"), []).append(lap)
+    if len(groups) < 2:
+        return []
+    blocks = []
+    for step, laps in groups.items():
+        d = sum(lap.get("distance_m") or 0 for lap in laps)
+        t = sum(lap.get("duration_s") or 0 for lap in laps)
+        paces = [lap["pace_s_per_km"] for lap in laps if lap.get("pace_s_per_km")]
+        hrs = [lap["avg_hr"] for lap in laps if lap.get("avg_hr") is not None]
+        p_slope, h_slope = _slope(paces), _slope(hrs)
+        blocks.append(
+            {
+                "workout_step": step,
+                "count": len(laps),
+                "avg_distance_m": d / len(laps),
+                "avg_duration_s": t / len(laps),
+                "avg_pace_s_per_km": pace_from(d, t),
+                "avg_pace_str": fmt_pace(pace_from(d, t)),
+                "avg_hr": round(_mean(hrs)) if hrs else None,
+                "pace_stdev_s_per_km": round(statistics.pstdev(paces), 1) if len(paces) > 1 else 0.0,
+                "pace_trend_s_per_km_per_interval": round(p_slope, 2) if p_slope is not None else None,
+                "hr_trend_bpm_per_interval": round(h_slope, 2) if h_slope is not None else None,
+                "trend_text": _trend_text(p_slope, h_slope),
+            }
+        )
+    return blocks
 
 
 def _trend_text(pace_slope: float | None, hr_slope: float | None) -> str:
@@ -648,6 +687,12 @@ def _data_notes(ts, zones, weather, laps) -> list[str]:
         notes.append("Keine Wetterdaten verfügbar.")
     if not laps:
         notes.append("Keine Laps verfügbar.")
+    stubs = [str(lap["nr"]) for lap in laps if lap.get("stub")]
+    if stubs:
+        notes.append(
+            f"Lap {', '.join(stubs)} ist ein Stummel (Garmin intensity=active, aber kürzer als min_lap_km) "
+            "und wurde nicht als Belastungs-Intervall gewertet."
+        )
     return notes
 
 
@@ -728,11 +773,21 @@ def render_markdown(a: dict[str, Any]) -> str:
         lines.append(f"- Streuung der Pace: ±{fmt_num(iv['pace_stdev_s_per_km'], 1)} s/km (Spanne {fmt_num(iv['pace_range_s_per_km'], 1)} s/km)")
         lines.append(f"- Ø-HF: {fmt_num(iv['avg_hr'])} bpm, Max-HF: {fmt_num(iv['max_hr'])} bpm, Ø-HF-Anstieg innerhalb der Intervalle: {fmt_num(iv['avg_hr_rise_in_lap'], 1)} bpm")
         lines.append(f"- Trend: {iv['trend_text']}")
+        for b in iv.get("blocks") or []:
+            lines.append(
+                f"- Block (Workout-Schritt {b['workout_step']}): {b['count']} × {fmt_dur(b['avg_duration_s'])} / Ø {fmt_km(b['avg_distance_m'])} km, "
+                f"Ø-Pace {b['avg_pace_str']} min/km (±{fmt_num(b['pace_stdev_s_per_km'], 1)} s/km), Ø-HF {fmt_num(b['avg_hr'])} bpm. {b['trend_text']}"
+            )
         rec = iv.get("recovery_to_threshold_s_avg")
         rec_list = ", ".join("–" if r is None else fmt_dur(r) for r in iv.get("recovery_to_threshold_s_list", []))
+        reached = iv.get("recovery_to_threshold_reached", 0)
         lines.append(
             f"- Erholung bis HF < {iv['recovery_hr_threshold']} bpm: "
-            + (f"Ø {fmt_dur(rec)} (je Intervall: {rec_list})" if rec is not None else f"Schwelle nicht erreicht oder keine Zeitreihe (je Intervall: {rec_list})")
+            + (
+                f"Ø {fmt_dur(rec)} – Schwelle nur nach {reached} von {iv['count']} Intervallen erreicht (je Intervall: {rec_list})"
+                if rec is not None
+                else f"Schwelle nach keinem der {iv['count']} Intervalle vor dem nächsten Belastungs-Lap erreicht (Pausen zu kurz) oder keine Zeitreihe (je Intervall: {rec_list})"
+            )
         )
         if iv.get("recovery_lap_avg_hr"):
             lines.append(f"- Ø-HF in den Erholungs-Laps: {iv['recovery_lap_avg_hr']} bpm")
@@ -786,9 +841,11 @@ def _safe(fn, *args, label: str = "", **kwargs):
 
 def activity_row(act: dict[str, Any]) -> str:
     n = normalize_summary_api(act)
+    t = n["type"] or ""
+    pace = fmt_pace(n["pace_s_per_km"]) if any(k in t for k in ("running", "walking", "hiking")) else "–"
     return (
-        f"{n['start_local'] or n['date']:<20} {n['type'] or '':<18} {fmt_km(n['distance_m']):>7} km "
-        f"{fmt_dur(n['duration_s']):>8}  {fmt_pace(n['pace_s_per_km']):>5} min/km  Ø-HF {fmt_num(n['avg_hr']):>3}  "
+        f"{n['start_local'] or n['date']:<20} {t:<18} {fmt_km(n['distance_m']):>7} km "
+        f"{fmt_dur(n['duration_s']):>8}  {pace:>5} min/km  Ø-HF {fmt_num(n['avg_hr']):>3}  "
         f"ID {n['activity_id']}  {n['name'] or ''}"
     )
 
