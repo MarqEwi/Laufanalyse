@@ -106,9 +106,22 @@ vorhandenen Workouts des Kontos:
 | Ziel Pace | `pace.zone` (id 6) mit `targetValueOne` = schnellere, `targetValueTwo` = langsamere Geschwindigkeit in m/s (4:32 min/km = 3,676 m/s) |
 | Wiederholung | `RepeatGroupDTO` mit `numberOfIterations`, `endCondition` iterations=7, `workoutSteps` |
 
-Hinweis: In Claude-Code-Cloud-Sessions kann der Upload von der Berechtigungsprüfung als externer Schreibzugriff
-blockiert werden; dann `--dry-run` zur Kontrolle und den Upload am PC ausführen oder eine Bash-Regel für
-`uv run scripts/garmin_workout.py` in den Einstellungen freigeben.
+MCP-Tools dazu (Skill `/workout`):
+
+| Tool | Parameter | Wirkung |
+|---|---|---|
+| `list_workouts` | `limit`=20 | Bibliothek: `workout_id`, `name`, `sport` |
+| `get_workout` | `workout_id` | lesbare Schrittliste (`text`) + Rohdaten (`raw`) |
+| `create_workout` | `spec` (JSON wie oben), `schedule_date`?, `dry_run`=false | baut das Garmin-JSON, lädt hoch (Schreibzugriff), liest zur Kontrolle zurück, terminiert optional; `dry_run=true` zeigt nur `text` |
+| `schedule_workout` | `workout_id`, `date` | Termin im Garmin-Kalender |
+| `delete_workout` | `workout_id` | löscht aus der Bibliothek |
+
+Berechtigungen: Die Schreib-Tools lösen in Claude Code eine Berechtigungsabfrage aus (in der App bestätigen).
+Im Auto-Modus einer Cloud-Session kann die automatische Prüfung den Upload als externen Schreibzugriff
+ablehnen (17.09.2026 beobachtet, ebenso das Bearbeiten von `.claude/settings.json` durch Claude); dann
+`dry_run` zur Kontrolle und den Upload in einer normalen Session oder am PC ausführen. Dauerhaft freigeben:
+`permissions.allow` in `.claude/settings.json` mit `mcp__garmin__create_workout`, `mcp__garmin__schedule_workout`,
+`mcp__garmin__delete_workout` und `Bash(uv run scripts/garmin_workout.py:*)` – vom Nutzer selbst eintragen.
 
 ## 4. Bekannte Einschränkungen
 

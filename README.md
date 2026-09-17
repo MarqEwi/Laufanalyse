@@ -82,6 +82,7 @@ Sind die Tokens abgelaufen, kann Claude die MFA-Anmeldung auch in der Cloud-Sess
 | `/laufanalyse 19876543210` | Aktivitäts-ID |
 | `/laufanalyse --fit export.fit` | ohne API aus einer FIT-Datei (Garmin Connect → Aktivität → „Original exportieren“) |
 | Nachfragen | „Wie schnell war ich in Intervall 3 und wie hoch war die Ø-HF?“, „Vergleiche die 1000er von heute mit denen vor zwei Wochen“ – die Skill nutzt die gesicherten Daten |
+| `/workout` + Text oder Screenshot des Coach-Plans | legt das Training als Garmin-Workout an (Schrittliste zur Bestätigung, Upload, Termin im Kalender), auch vom Smartphone |
 
 Skript direkt (PC-Terminal oder Cloud-Bash):
 
@@ -104,7 +105,8 @@ uv run scripts\garmin_workout.py create workouts\indoor_cycling_nxt_lvl.json    
 | `.claude/settings.json` | gibt Projekt-MCP-Server frei, registriert den Session-Start-Hook |
 | `.claude/hooks/session-start.sh` | Cloud-Vorbereitung (nur wenn `CLAUDE_CODE_REMOTE=true`) |
 | `.claude/skills/laufanalyse/SKILL.md` | Skill `/laufanalyse` |
-| `scripts/garmin_mcp_server.py` | MCP-Server (15 Tools, u. a. `analyze_run`, `analyze_fit`, `get_activity_laps`, `get_activity_timeseries`) |
+| `.claude/skills/workout/SKILL.md` | Skill `/workout` (Workouts anlegen, MCP-Tools `create_workout`, `schedule_workout`, `list_workouts`, `get_workout`, `delete_workout`) |
+| `scripts/garmin_mcp_server.py` | MCP-Server (20 Tools, u. a. `analyze_run`, `analyze_fit`, `get_activity_laps`, `get_activity_timeseries`, `create_workout`) |
 | `scripts/garmin_export.py` | Export + Analyse als CLI, FIT-Fallback |
 | `scripts/garmin_login.py` | Anmeldung mit MFA (Terminal oder `--mfa-file`), `--show-token` |
 | `scripts/garmin_auth.py` | gemeinsame Anmeldung (Env-Variablen, Token-Ordner, Token aus `GARMIN_TOKENS_B64`) |
@@ -113,6 +115,15 @@ uv run scripts\garmin_workout.py create workouts\indoor_cycling_nxt_lvl.json    
 | `scripts/setup-garmin-mcp.ps1` | Windows-Einrichtung |
 | `docs/garmin-tools.md` | Tools, Parameter, Datenfelder, Einschränkungen |
 | `data/garmin/<datum>_<id>/` | `summary.md`, `analysis.json`, `laps.csv/json`, `timeseries.csv`, `raw/*.json` (nicht versioniert) |
+
+## Workouts vom Smartphone anlegen
+
+Claude-App → Code → Repo → Session starten → Screenshot oder Text des Coach-Plans schicken und z. B. schreiben:
+„/workout Name: NXT LVL Hyrox Workout, Termin morgen“. Claude zeigt die Schrittliste, du bestätigst, Claude lädt
+hoch und terminiert. Beim ersten Schreibzugriff fragt Claude Code nach der Berechtigung für
+`mcp__garmin__create_workout` – einmal erlauben. Dauerhaft ohne Rückfrage: in `.claude/settings.json` unter
+`permissions.allow` die Einträge `mcp__garmin__create_workout`, `mcp__garmin__schedule_workout` und
+`mcp__garmin__delete_workout` eintragen.
 
 ## Bekannte Einschränkungen
 

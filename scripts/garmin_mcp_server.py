@@ -38,6 +38,7 @@ from mcp.server.fastmcp import FastMCP  # noqa: E402
 
 import garmin_auth  # noqa: E402
 import garmin_export as ge  # noqa: E402
+import garmin_workout as gw  # noqa: E402
 
 mcp_server = FastMCP("garmin")
 _client: Any = None
@@ -311,6 +312,72 @@ def login_status() -> dict[str, Any]:
         info["ok"] = False
         info["error"] = str(exc)
     return info
+
+
+# ----------------------------------------------------------------------------
+# Workouts anlegen (Skill /workout) – Schreibzugriffe auf das Garmin-Konto
+# ----------------------------------------------------------------------------
+
+
+@mcp_server.tool()
+def list_workouts(limit: int = 20) -> list[dict[str, Any]]:
+    """Workouts der Garmin-Bibliothek: workout_id, name, sport."""
+    out = []
+    for w in _call("get_workouts", 0, limit) or []:
+        out.append({
+            "workout_id": w.get("workoutId"),
+            "name": w.get("workoutName"),
+            "sport": (w.get("sportType") or {}).get("sportTypeKey"),
+        })
+    return out
+
+
+@mcp_server.tool()
+def get_workout(workout_id: int) -> dict[str, Any]:
+    """Ein Workout aus der Bibliothek: lesbare Schrittliste (text) und Rohdaten (raw)."""
+    w = _call("get_workout_by_id", workout_id)
+    return {"workout_id": workout_id, "text": gw.describe(w), "raw": w}
+
+
+@mcp_server.tool()
+def create_workout(spec: dict[str, Any], schedule_date: str | None = None, dry_run: bool = False) -> dict[str, Any]:
+    """Workout aus einer Spezifikation anlegen (Schreibzugriff!) und optional im Kalender terminieren.
+
+    spec = {"name": str, "sport": "running|cycling|swimming|walking|hiking|other", "description": str?,
+            "steps": [ {"type": "warmup|interval|recovery|rest|cooldown", "duration_s": 120 | "distance_m": 1000 | "end": "lap",
+                        "target": {"hr_bpm": [90, 130]} | {"hr_zone": 2} | {"pace_min_km": ["4:10", "4:20"]} | null,
+                        "note": "Text auf der Uhr"?},
+                       {"repeat": 6, "steps": [...]} ] }
+    schedule_date: YYYY-MM-DD (z. B. morgen). dry_run=True zeigt nur die Struktur, lädt nichts hoch.
+    Rückgabe: text (Schrittliste), workout_id, schedule (falls terminiert). Immer erst dry_run zeigen und
+    den Nutzer bestätigen lassen.
+    """
+    payload = gw.build_workout(spec)
+    result: dict[str, Any] = {"text": gw.describe(payload), "dry_run": dry_run}
+    if dry_run:
+        return result
+    res = _call("upload_workout", payload)
+    wid = res.get("workoutId")
+    saved = _call("get_workout_by_id", wid)
+    result.update({"workout_id": wid, "text": gw.describe(saved), "uploaded": True})
+    if schedule_date:
+        r = _call("schedule_workout", wid, schedule_date)
+        result["schedule"] = {"date": schedule_date, "workout_schedule_id": r.get("workoutScheduleId") if isinstance(r, dict) else r}
+    return result
+
+
+@mcp_server.tool()
+def schedule_workout(workout_id: int, date: str) -> dict[str, Any]:
+    """Vorhandenes Workout an einem Datum (YYYY-MM-DD) in den Garmin-Kalender eintragen (Schreibzugriff)."""
+    r = _call("schedule_workout", workout_id, date)
+    return {"workout_id": workout_id, "date": date, "result": r}
+
+
+@mcp_server.tool()
+def delete_workout(workout_id: int) -> dict[str, Any]:
+    """Workout aus der Bibliothek löschen (Schreibzugriff, nur auf ausdrücklichen Wunsch des Nutzers)."""
+    _call("delete_workout", workout_id)
+    return {"workout_id": workout_id, "deleted": True}
 
 
 if __name__ == "__main__":
