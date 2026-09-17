@@ -54,7 +54,7 @@ Einmalig unter [claude.ai/code](https://claude.ai/code) → Cloud-Umgebung (Defa
 
 | Einstellung | Wert |
 |---|---|
-| Netzwerkzugriff | **Custom**, erlaubte Domain `*.garmin.com` (Paketquellen wie PyPI sind bereits erlaubt) |
+| Netzwerkzugriff | **Custom**, erlaubte Domains `*.garmin.com`, `pypi.org` und `files.pythonhosted.org`. Ohne die beiden PyPI-Hosts kann `uv` die Abhängigkeiten (`mcp`, `garminconnect`, `fitparse`) nicht installieren; der MCP-Server startet dann nicht und die Skripte laufen nicht (geprüft am 17.09.2026: „Host not in allowlist: pypi.org“). |
 | Umgebungsvariablen | `GARMIN_EMAIL=marc.ewers@gmx.de` und `GARMIN_TOKENS_B64=<Wert aus dem Setup-Skript>` |
 | optional | `GARMIN_PASSWORD=…` nur, wenn du in der Cloud auch ohne gültige Tokens (mit MFA-Dialog) anmelden willst |
 

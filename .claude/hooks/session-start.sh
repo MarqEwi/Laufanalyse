@@ -28,7 +28,12 @@ if [ -z "${LAUFANALYSE_DATA_DIR:-}" ] && [ -n "${CLAUDE_ENV_FILE:-}" ]; then
 fi
 
 # Abhängigkeiten vorinstallieren (wird im Container-Cache gehalten)
-uv run scripts/garmin_mcp_server.py --warmup || echo "Warnung: Abhängigkeiten konnten nicht vorinstalliert werden."
+if ! uv run scripts/garmin_mcp_server.py --warmup; then
+  echo "Warnung: Abhängigkeiten konnten nicht vorinstalliert werden."
+  if [ "$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 https://pypi.org/simple/ 2>/dev/null)" = "403" ]; then
+    echo "Ursache: pypi.org ist in der Netzwerk-Policy der Cloud-Umgebung nicht freigegeben. Bitte pypi.org und files.pythonhosted.org zu den erlaubten Domains hinzufügen."
+  fi
+fi
 uv run scripts/garmin_export.py --help >/dev/null 2>&1 || true
 
 # Tokens aus der Umgebungsvariable in den Token-Ordner schreiben
