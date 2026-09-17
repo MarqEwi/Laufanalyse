@@ -30,6 +30,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
+$ExpectedRoot = "E:\Users\Marc\Claude Projekte\GarminConnect"
+if ($RepoRoot -ne $ExpectedRoot) {
+    Write-Host "Hinweis: Repo liegt in '$RepoRoot', vorgesehen ist '$ExpectedRoot' (siehe CLAUDE.md)." -ForegroundColor Yellow
+}
 $TokenDir = Join-Path $env:USERPROFILE ".garminconnect"
 $DataDir  = Join-Path $RepoRoot "data\garmin"
 $Server   = Join-Path $RepoRoot "scripts\garmin_mcp_server.py"

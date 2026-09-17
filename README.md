@@ -26,11 +26,18 @@ Tokens landen nie in Dateien des Repos (`.gitignore`).
 
 Voraussetzungen: [uv](https://docs.astral.sh/uv/) (`winget install --id astral-sh.uv -e`) und die Claude-Code-CLI.
 
+Projektordner auf dem PC: `E:\Users\Marc\Claude Projekte\GarminConnect` (Konvention: alle Claude-Projekte
+liegen unter `E:\Users\Marc\Claude Projekte\<Projektname>`, siehe `CLAUDE.md`).
+
 ```powershell
-git clone https://github.com/MarqEwi/Laufanalyse
-cd Laufanalyse
+New-Item -ItemType Directory -Force "E:\Users\Marc\Claude Projekte" | Out-Null
+git clone -b claude/trusting-ptolemy-osb557 https://github.com/MarqEwi/Laufanalyse "E:\Users\Marc\Claude Projekte\GarminConnect"
+cd "E:\Users\Marc\Claude Projekte\GarminConnect"
 powershell -ExecutionPolicy Bypass -File scripts\setup-garmin-mcp.ps1
 ```
+
+Das Setup-Skript leitet alle Pfade (MCP-Server, Datenordner `data\garmin`, Skill-Kopie) aus dem Ordner ab,
+in dem das Repo liegt.
 
 Das Skript fragt E-Mail und Passwort ab (ohne Anzeige), legt sie als Benutzer-Umgebungsvariablen ab,
 meldet sich an (MFA-Code wird abgefragt), zeigt zum Test die letzten 5 Aktivitäten samt Kennzahlen des
