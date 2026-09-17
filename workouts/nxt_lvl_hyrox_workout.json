@@ -1,0 +1,37 @@
+{
+  "name": "NXT LVL Hyrox Workout",
+  "sport": "other",
+  "description": "Coach Engelhardt 18.09.2026: Run Int. SSP, RPE 7, 4x6 min Threshold (als 2/2/2). Laufen im Wechsel mit Hyrox-Stationen, 1 min Bike Erg locker zwischen den Bloecken.",
+  "steps": [
+    {"type": "warmup",   "duration_s": 1200, "note": "Bike easy WA"},
+
+    {"type": "interval", "duration_s": 120, "note": "Run RPE 7"},
+    {"type": "interval", "duration_s": 120, "note": "Ski Erg"},
+    {"type": "interval", "duration_s": 120, "note": "Run RPE 7"},
+    {"type": "interval", "duration_s": 120, "note": "Sled Push"},
+    {"type": "interval", "duration_s": 120, "note": "Run RPE 7"},
+    {"type": "recovery", "duration_s": 60,  "note": "Bike Erg aktive Erholung"},
+
+    {"type": "interval", "duration_s": 120, "note": "Run RPE 7"},
+    {"type": "interval", "duration_s": 120, "note": "Sled Pull"},
+    {"type": "interval", "duration_s": 120, "note": "Run RPE 7"},
+    {"type": "interval", "duration_s": 120, "note": "Burpee Broad Jumps"},
+    {"type": "interval", "duration_s": 120, "note": "Run RPE 7"},
+    {"type": "recovery", "duration_s": 60,  "note": "Bike Erg aktive Erholung"},
+
+    {"type": "interval", "duration_s": 120, "note": "Run RPE 7"},
+    {"type": "interval", "duration_s": 120, "note": "Row"},
+    {"type": "interval", "duration_s": 120, "note": "Run RPE 7"},
+    {"type": "interval", "duration_s": 120, "note": "Farmers Carry"},
+    {"type": "interval", "duration_s": 120, "note": "Run RPE 7"},
+    {"type": "recovery", "duration_s": 60,  "note": "Bike Erg aktive Erholung"},
+
+    {"type": "interval", "duration_s": 120, "note": "Run RPE 7"},
+    {"type": "interval", "duration_s": 120, "note": "Lunges"},
+    {"type": "interval", "duration_s": 120, "note": "Run RPE 7"},
+    {"type": "interval", "duration_s": 120, "note": "Wall Balls"},
+    {"type": "interval", "duration_s": 120, "note": "Run RPE 7"},
+
+    {"type": "cooldown", "duration_s": 1200, "note": "Bike easy Cooldown"}
+  ]
+}
