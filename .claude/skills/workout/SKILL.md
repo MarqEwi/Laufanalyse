@@ -7,7 +7,8 @@ argument-hint: "[Beschreibung oder Screenshot des Trainings] [Name] [Datum, z. B
 # Workout in Garmin Connect anlegen
 
 Datenquelle und Ziel ist der MCP-Server `garmin` (Tools `mcp__garmin__*`). Die Workout-Tools sind
-`list_workouts`, `get_workout`, `create_workout`, `schedule_workout`, `delete_workout`; die Logik steckt in
+`list_workouts`, `get_workout`, `create_workout`, `schedule_workout`, `list_scheduled_workouts`,
+`unschedule_workout`, `delete_workout`; die Logik steckt in
 `scripts/garmin_workout.py` (auch als CLI am PC nutzbar). Vorlagen liegen unter `workouts/*.json`.
 
 ## Regeln
@@ -18,7 +19,8 @@ Datenquelle und Ziel ist der MCP-Server `garmin` (Tools `mcp__garmin__*`). Die W
   dann `create_workout(spec, schedule_date=…)` ohne `dry_run`.
 - Nichts erfinden: Unklare Abkürzungen im Coach-Plan (z. B. BBJ, WB, SSP) ausschreiben und im Ergebnis nennen,
   damit der Nutzer sie korrigieren kann. Fehlende Angaben (Dauer, Ziel) nachfragen statt raten.
-- `delete_workout` nur auf ausdrücklichen Wunsch.
+- `delete_workout` und `unschedule_workout` nur auf ausdrücklichen Wunsch. Vor dem Terminieren mit
+  `list_scheduled_workouts` prüfen, ob das Workout an dem Tag schon steht (keine Doppeleinträge).
 - Die Spezifikation zusätzlich als Datei `workouts/<name_in_kleinbuchstaben>.json` speichern und auf dem
   aktuellen Branch committen/pushen, damit sie am PC und in späteren Sessions wiederverwendbar ist.
 

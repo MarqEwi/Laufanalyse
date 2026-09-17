@@ -9,6 +9,8 @@
     uv run scripts/garmin_workout.py create spec.json [--schedule YYYY-MM-DD] [--dry-run]
     uv run scripts/garmin_workout.py schedule <workout_id> YYYY-MM-DD
     uv run scripts/garmin_workout.py delete <workout_id>
+    uv run scripts/garmin_workout.py calendar [YYYY-MM]          # terminierte Workouts im Monat
+    uv run scripts/garmin_workout.py unschedule <termin_id>      # Termin entfernen (Workout bleibt)
 
 Spezifikation (JSON):
 
@@ -208,6 +210,17 @@ def describe(w: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def scheduled_workouts(client, year: int, month: int) -> list[dict[str, Any]]:
+    """Terminierte Workouts eines Monats (Garmin-Kalender)."""
+    cal = client.get_scheduled_workouts(year, month) or {}
+    out = []
+    for it in cal.get("calendarItems", []):
+        if it.get("itemType") == "workout" or it.get("workoutId"):
+            out.append({"date": it.get("date"), "name": it.get("title"), "workout_id": it.get("workoutId"),
+                        "schedule_id": it.get("id"), "sport": it.get("sportTypeKey")})
+    return sorted(out, key=lambda x: (x["date"] or "", x["schedule_id"] or 0))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -224,6 +237,10 @@ def main() -> int:
     p.add_argument("date")
     p = sub.add_parser("delete", help="Workout aus der Bibliothek löschen")
     p.add_argument("workout_id", type=int)
+    p = sub.add_parser("calendar", help="terminierte Workouts eines Monats anzeigen")
+    p.add_argument("month", nargs="?", help="YYYY-MM (Standard: aktueller Monat)")
+    p = sub.add_parser("unschedule", help="Termin aus dem Kalender entfernen (Workout bleibt in der Bibliothek)")
+    p.add_argument("schedule_id", type=int, help="Termin-ID aus `calendar`")
     a = ap.parse_args()
 
     payload: dict[str, Any] | None = None
@@ -257,6 +274,15 @@ def main() -> int:
     elif a.cmd == "delete":
         client.delete_workout(a.workout_id)
         print(f"Workout {a.workout_id} gelöscht.")
+    elif a.cmd == "calendar":
+        from datetime import date as _date
+        ym = a.month or _date.today().strftime("%Y-%m")
+        y, m = (int(x) for x in ym.split("-"))
+        for it in scheduled_workouts(client, y, m):
+            print(f"{it['date']}  {it['name']:<45} Workout {it['workout_id']}  Termin-ID {it['schedule_id']}")
+    elif a.cmd == "unschedule":
+        client.unschedule_workout(a.schedule_id)
+        print(f"Termin {a.schedule_id} entfernt.")
     return 0
 
 

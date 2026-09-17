@@ -374,6 +374,19 @@ def schedule_workout(workout_id: int, date: str) -> dict[str, Any]:
 
 
 @mcp_server.tool()
+def list_scheduled_workouts(year: int, month: int) -> list[dict[str, Any]]:
+    """Terminierte Workouts eines Monats im Garmin-Kalender: date, name, workout_id, schedule_id."""
+    return gw.scheduled_workouts(_client_or_raise(), year, month)
+
+
+@mcp_server.tool()
+def unschedule_workout(schedule_id: int) -> dict[str, Any]:
+    """Termin aus dem Kalender entfernen (schedule_id aus list_scheduled_workouts); das Workout bleibt in der Bibliothek."""
+    _call("unschedule_workout", schedule_id)
+    return {"schedule_id": schedule_id, "unscheduled": True}
+
+
+@mcp_server.tool()
 def delete_workout(workout_id: int) -> dict[str, Any]:
     """Workout aus der Bibliothek löschen (Schreibzugriff, nur auf ausdrücklichen Wunsch des Nutzers)."""
     _call("delete_workout", workout_id)

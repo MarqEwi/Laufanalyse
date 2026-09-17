@@ -114,6 +114,8 @@ MCP-Tools dazu (Skill `/workout`):
 | `get_workout` | `workout_id` | lesbare Schrittliste (`text`) + Rohdaten (`raw`) |
 | `create_workout` | `spec` (JSON wie oben), `schedule_date`?, `dry_run`=false | baut das Garmin-JSON, lädt hoch (Schreibzugriff), liest zur Kontrolle zurück, terminiert optional; `dry_run=true` zeigt nur `text` |
 | `schedule_workout` | `workout_id`, `date` | Termin im Garmin-Kalender |
+| `list_scheduled_workouts` | `year`, `month` | Kalender: `date`, `name`, `workout_id`, `schedule_id` (Quelle `/calendar-service/year/{y}/month/{m}` → `calendarItems[itemType=workout]`) |
+| `unschedule_workout` | `schedule_id` | Termin entfernen, Workout bleibt |
 | `delete_workout` | `workout_id` | löscht aus der Bibliothek |
 
 Berechtigungen: Die Schreib-Tools lösen in Claude Code eine Berechtigungsabfrage aus (in der App bestätigen).

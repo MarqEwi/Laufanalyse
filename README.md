@@ -105,8 +105,8 @@ uv run scripts\garmin_workout.py create workouts\indoor_cycling_nxt_lvl.json    
 | `.claude/settings.json` | gibt Projekt-MCP-Server frei, registriert den Session-Start-Hook |
 | `.claude/hooks/session-start.sh` | Cloud-Vorbereitung (nur wenn `CLAUDE_CODE_REMOTE=true`) |
 | `.claude/skills/laufanalyse/SKILL.md` | Skill `/laufanalyse` |
-| `.claude/skills/workout/SKILL.md` | Skill `/workout` (Workouts anlegen, MCP-Tools `create_workout`, `schedule_workout`, `list_workouts`, `get_workout`, `delete_workout`) |
-| `scripts/garmin_mcp_server.py` | MCP-Server (20 Tools, u. a. `analyze_run`, `analyze_fit`, `get_activity_laps`, `get_activity_timeseries`, `create_workout`) |
+| `.claude/skills/workout/SKILL.md` | Skill `/workout` (Workouts anlegen, MCP-Tools `create_workout`, `schedule_workout`, `list_workouts`, `get_workout`, `list_scheduled_workouts`, `unschedule_workout`, `delete_workout`) |
+| `scripts/garmin_mcp_server.py` | MCP-Server (22 Tools, u. a. `analyze_run`, `analyze_fit`, `get_activity_laps`, `get_activity_timeseries`, `create_workout`) |
 | `scripts/garmin_export.py` | Export + Analyse als CLI, FIT-Fallback |
 | `scripts/garmin_login.py` | Anmeldung mit MFA (Terminal oder `--mfa-file`), `--show-token` |
 | `scripts/garmin_auth.py` | gemeinsame Anmeldung (Env-Variablen, Token-Ordner, Token aus `GARMIN_TOKENS_B64`) |
