@@ -1,0 +1,15 @@
+{
+  "name": "NXT LVL Long Distanz Workout",
+  "sport": "other",
+  "description": "Coach Engelhardt 19.09.2026: SSP LT1, For Completion. 10k Bike, 5 Runden 1k Ski + 1k Row, 10k Bike. RPE 4-5 (Talking Pace, man kann sich unterhalten). Distanz am Ergometer ablesen, dann Rundentaste druecken.",
+  "steps": [
+    {"type": "interval", "end": "lap", "note": "Bike 10 km locker, dann Runde"},
+
+    {"repeat": 5, "steps": [
+      {"type": "interval", "end": "lap", "note": "Ski Erg 1 km, dann Runde"},
+      {"type": "interval", "end": "lap", "note": "Rudern 1 km, dann Runde"}
+    ]},
+
+    {"type": "interval", "end": "lap", "note": "Bike 10 km locker, dann Runde"}
+  ]
+}
