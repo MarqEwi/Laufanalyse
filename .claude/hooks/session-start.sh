@@ -47,6 +47,18 @@ elif garmin_auth.tokens_present():
     print("Garmin-Tokens vorhanden.")
 else:
     print("Hinweis: keine Garmin-Tokens (GARMIN_TOKENS_B64 in der Cloud-Umgebung setzen).")
+import concept2_auth
+if concept2_auth.materialize_tokens_from_env():
+    print(f"Concept2-Tokens aus CONCEPT2_TOKENS_B64 nach {concept2_auth.token_file()} geschrieben.")
+elif concept2_auth.tokens_present():
+    print("Concept2-Tokens vorhanden.")
+else:
+    print("Hinweis: keine Concept2-Tokens (optional: CONCEPT2_TOKENS_B64 in der Cloud-Umgebung setzen).")
 PY
+
+# Datenordner für Concept2-Einheiten
+if [ -z "${CONCEPT2_DATA_DIR:-}" ] && [ -n "${CLAUDE_ENV_FILE:-}" ]; then
+  echo "export CONCEPT2_DATA_DIR=\"$ROOT/data/concept2\"" >> "$CLAUDE_ENV_FILE"
+fi
 
 echo "Garmin-MCP: Vorbereitung abgeschlossen."

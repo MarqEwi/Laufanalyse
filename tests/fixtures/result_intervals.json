@@ -1,0 +1,119 @@
+{
+ "data": {
+  "id": 777,
+  "user_id": 1,
+  "date": "2026-09-19 07:30:00",
+  "timezone": "Europe/Berlin",
+  "date_utc": "2026-09-19 05:30:00",
+  "distance": 5000,
+  "type": "skierg",
+  "time": 12300,
+  "time_formatted": "20:30.0",
+  "workout_type": "FixedDistanceInterval",
+  "source": "ErgData",
+  "weight_class": "H",
+  "verified": true,
+  "ranked": false,
+  "comments": "5x1000m Ski",
+  "privacy": "private",
+  "stroke_data": true,
+  "stroke_rate": 40,
+  "stroke_count": 500,
+  "calories_total": 340,
+  "drag_factor": 110,
+  "rest_distance": 0,
+  "rest_time": 2400,
+  "heart_rate": {
+   "min": 118,
+   "average": 152,
+   "max": 171,
+   "ending": 171,
+   "recovery": 140
+  },
+  "workout": {
+   "splits": [],
+   "intervals": [
+    {
+     "type": "distance",
+     "time": 2400,
+     "distance": 1000,
+     "rest_time": 600,
+     "rest_distance": 0,
+     "calories_total": 68,
+     "stroke_rate": 38,
+     "machine": "skierg",
+     "heart_rate": {
+      "average": 140,
+      "min": 120,
+      "max": 158,
+      "ending": 160
+     }
+    },
+    {
+     "type": "distance",
+     "time": 2430,
+     "distance": 1000,
+     "rest_time": 600,
+     "rest_distance": 0,
+     "calories_total": 68,
+     "stroke_rate": 39,
+     "machine": "skierg",
+     "heart_rate": {
+      "average": 148,
+      "min": 128,
+      "max": 165,
+      "ending": 165
+     }
+    },
+    {
+     "type": "distance",
+     "time": 2460,
+     "distance": 1000,
+     "rest_time": 600,
+     "rest_distance": 0,
+     "calories_total": 68,
+     "stroke_rate": 40,
+     "machine": "skierg",
+     "heart_rate": {
+      "average": 153,
+      "min": 132,
+      "max": 168,
+      "ending": 168
+     }
+    },
+    {
+     "type": "distance",
+     "time": 2490,
+     "distance": 1000,
+     "rest_time": 600,
+     "rest_distance": 0,
+     "calories_total": 68,
+     "stroke_rate": 41,
+     "machine": "skierg",
+     "heart_rate": {
+      "average": 157,
+      "min": 135,
+      "max": 170,
+      "ending": 170
+     }
+    },
+    {
+     "type": "distance",
+     "time": 2520,
+     "distance": 1000,
+     "rest_time": 600,
+     "rest_distance": 0,
+     "calories_total": 68,
+     "stroke_rate": 42,
+     "machine": "skierg",
+     "heart_rate": {
+      "average": 162,
+      "min": 138,
+      "max": 171,
+      "ending": 171
+     }
+    }
+   ]
+  }
+ }
+}

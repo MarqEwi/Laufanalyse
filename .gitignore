@@ -4,10 +4,12 @@
 *.token
 *_tokens.json
 garmin_tokens.json
+concept2_tokens.json
 oauth1_token.json
 oauth2_token.json
 .garminconnect/
 .garmin-mcp/
+.concept2/
 .claude/settings.local.json
 
 # --- Exportierte Rohdaten (persönliche Gesundheitsdaten) ---
@@ -15,6 +17,9 @@ data/*
 !data/garmin/
 data/garmin/*
 !data/garmin/.gitkeep
+!data/concept2/
+data/concept2/*
+!data/concept2/.gitkeep
 *.fit
 *.FIT
 *.tcx

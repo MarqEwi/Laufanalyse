@@ -1,8 +1,9 @@
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["mcp>=1.10,<2", "garminconnect>=0.3.2", "fitparse>=1.2.0"]
+# dependencies = ["mcp>=1.10,<2", "garminconnect>=0.3.2", "fitparse>=1.2.0", "requests>=2.31"]
 # ///
 """MCP-Server „garmin“ für Claude Code – läuft auf PC und in Cloud-Sessions (Smartphone) identisch.
+Enthält zusätzlich die Concept2-Logbook-Tools (concept2_*), siehe concept2_auth.py / concept2_export.py.
 
 Start (stdio):   uv run scripts/garmin_mcp_server.py
 Nur Abhängigkeiten installieren (Session-Start-Hook):  uv run scripts/garmin_mcp_server.py --warmup
@@ -30,18 +31,22 @@ if "--warmup" in sys.argv:
     import fitparse  # noqa: F401
     import garminconnect  # noqa: F401
     import mcp  # noqa: F401
+    import requests  # noqa: F401
 
     print("garmin-mcp: Abhängigkeiten installiert.")
     raise SystemExit(0)
 
 from mcp.server.fastmcp import FastMCP  # noqa: E402
 
+import concept2_auth as c2  # noqa: E402
+import concept2_export as ce  # noqa: E402
 import garmin_auth  # noqa: E402
 import garmin_export as ge  # noqa: E402
 import garmin_workout as gw  # noqa: E402
 
 mcp_server = FastMCP("garmin")
 _client: Any = None
+_c2_client: c2.Concept2Client | None = None
 
 
 def _client_or_raise():
@@ -391,6 +396,95 @@ def delete_workout(workout_id: int) -> dict[str, Any]:
     """Workout aus der Bibliothek löschen (Schreibzugriff, nur auf ausdrücklichen Wunsch des Nutzers)."""
     _call("delete_workout", workout_id)
     return {"workout_id": workout_id, "deleted": True}
+
+
+# ----------------------------------------------------------------------------
+# Concept2 Logbook (ErgData): Rudern, Ski Erg, Bike Erg – nur Lesezugriff
+# ----------------------------------------------------------------------------
+
+
+def _c2_or_raise() -> c2.Concept2Client:
+    global _c2_client
+    if _c2_client is None:
+        try:
+            _c2_client = c2.connect()
+        except Exception as exc:  # noqa: BLE001
+            raise RuntimeError(
+                f"Concept2-Anmeldung fehlgeschlagen: {exc} "
+                "(Cloud-Session: zusätzlich log.concept2.com in der Netzwerk-Policy der Umgebung freigeben.)"
+            ) from exc
+    return _c2_client
+
+
+def _c2_call(fn, *args: Any, **kwargs: Any) -> Any:
+    try:
+        return fn(*args, **kwargs)
+    except (c2.Concept2AuthError, c2.Concept2ApiError, RuntimeError) as exc:
+        raise RuntimeError(f"Concept2: {exc}") from exc
+
+
+@mcp_server.tool()
+def concept2_login_status() -> dict[str, Any]:
+    """Concept2 Logbook: Token-Ordner, gesetzte Variablen (Client-ID/-Secret, Token-Blob) und ob die Anmeldung funktioniert."""
+    tokens = c2.load_tokens() or {}
+    info: dict[str, Any] = {
+        "token_dir": str(c2.token_dir()),
+        "tokens_present": c2.tokens_present(),
+        "env_client_id_set": bool(os.environ.get("CONCEPT2_CLIENT_ID")),
+        "env_client_secret_set": bool(os.environ.get("CONCEPT2_CLIENT_SECRET")),
+        "env_tokens_blob_set": bool(os.environ.get("CONCEPT2_TOKENS_B64") or os.environ.get("CONCEPT2_TOKENS_JSON")),
+        "client_id_in_token_file": bool(tokens.get("client_id")),
+        "host": c2.host(),
+        "data_dir": str(ce.base_dir(None).resolve()),
+    }
+    try:
+        info["logged_in_as"] = c2.whoami(_c2_or_raise())
+        info["ok"] = True
+    except Exception as exc:  # noqa: BLE001
+        info["ok"] = False
+        info["error"] = str(exc)
+    return info
+
+
+@mcp_server.tool()
+def concept2_list_results(limit: int = 10, type: str | None = None, from_date: str | None = None, to_date: str | None = None) -> list[dict[str, Any]]:
+    """Letzte Einheiten aus dem Concept2 Logbook (neueste zuerst), kompakt: result_id, date, type (rower|skierg|bike …),
+    distance_m, time_str, pace_str (/500 m, Bike /1000 m), spm, hr_avg, hr_max, has_stroke_data. Datumsfilter YYYY-MM-DD."""
+    rows = _c2_call(ce.list_results, _c2_or_raise(), limit=limit, type_=type, from_date=from_date, to_date=to_date)
+    return [ce.compact(r) for r in rows]
+
+
+@mcp_server.tool()
+def concept2_get_result(result_id: int) -> dict[str, Any]:
+    """Eine Einheit aus dem Logbook: normalisierte Zusammenfassung (summary), Splits und Intervalle (Pace, SPM, HF), Rohdaten (raw)."""
+    r = _c2_call(_c2_or_raise().result, result_id)
+    s = ce.normalize_summary(r)
+    splits, intervals = ce.normalize_segments(r, s["type"])
+    return {"summary": s, "splits": splits, "intervals": intervals, "raw": r}
+
+
+@mcp_server.tool()
+def concept2_analyze_result(
+    result_id: int | None = None,
+    date: str | None = None,
+    type: str | None = None,
+    rpe: float | None = None,
+    out_dir: str | None = None,
+) -> dict[str, Any]:
+    """Ergometer-Einheit komplett laden (Zusammenfassung, Splits/Intervalle, Schlagdaten), unter
+    <out_dir>/<datum>_<result_id>/ sichern und auswerten. Ohne result_id/date: letzte Einheit (optional nur type).
+    rpe = Angabe des Nutzers für den Coach-Text. Rückgabe: output_dir, summary_md (Bericht), coach_text (Pace/HF/RPE
+    für den Coach), analysis (summary, segments mit HF-Anstieg, intervals_stats, notes)."""
+    client = _c2_or_raise()
+    rid = _c2_call(ce.resolve_result_id, client, result_id=result_id, date=date, type_=type)
+    out, analysis = _c2_call(ce.export_and_analyze, client, rid, rpe=rpe, out_dir=out_dir)
+    return {"output_dir": str(out.resolve()), "summary_md": ce.render_markdown(analysis), "coach_text": ce.coach_text(analysis), "analysis": analysis}
+
+
+@mcp_server.tool()
+def concept2_list_exported(out_dir: str | None = None) -> list[dict[str, Any]]:
+    """Bereits gesicherte Ergometer-Einheiten (Ordner, Datum, ID, Gerät, Distanz, Zeit, Pace, Ø-HF, Intervalle) – für Vergleiche ohne API."""
+    return ce.list_exported(ce.base_dir(out_dir))
 
 
 if __name__ == "__main__":

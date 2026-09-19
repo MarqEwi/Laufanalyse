@@ -1,0 +1,55 @@
+{
+ "data": {
+  "id": 778,
+  "date": "2026-09-02 16:15:00",
+  "timezone": "Europe/Berlin",
+  "distance": 2000,
+  "type": "rower",
+  "time": 4800,
+  "time_formatted": "8:00.0",
+  "workout_type": "FixedDistanceSplits",
+  "source": "ErgData",
+  "stroke_data": false,
+  "stroke_rate": 30,
+  "calories_total": 80,
+  "drag_factor": 122,
+  "heart_rate": {},
+  "workout": {
+   "splits": [
+    {
+     "type": "distance",
+     "time": 1180,
+     "distance": 500,
+     "calories_total": 20,
+     "stroke_rate": 30,
+     "heart_rate": {}
+    },
+    {
+     "type": "distance",
+     "time": 1200,
+     "distance": 500,
+     "calories_total": 20,
+     "stroke_rate": 29,
+     "heart_rate": {}
+    },
+    {
+     "type": "distance",
+     "time": 1210,
+     "distance": 500,
+     "calories_total": 20,
+     "stroke_rate": 29,
+     "heart_rate": {}
+    },
+    {
+     "type": "distance",
+     "time": 1210,
+     "distance": 500,
+     "calories_total": 20,
+     "stroke_rate": 31,
+     "heart_rate": {}
+    }
+   ],
+   "intervals": []
+  }
+ }
+}
