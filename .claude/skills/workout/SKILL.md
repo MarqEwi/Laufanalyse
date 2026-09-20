@@ -53,7 +53,10 @@ Datenquelle und Ziel ist der MCP-Server `garmin` (Tools `mcp__garmin__*`). Die W
   `distance_m` oder `"end": "lap"` (Rundentaste).
 - Ziele: `hr_bpm [low, high]`, `hr_zone 1–5`, `pace_min_km ["schnell", "langsam"]` (nur Laufen/Gehen),
   sonst kein Ziel. Garmin verlangt bei HF immer Unter- und Obergrenze („HF unter 130“ → `[90, 130]`, das sagen).
-- `note` erscheint auf der Uhr beim Schrittwechsel: Stationsname oder Anweisung (max. ~30 Zeichen).
+- `note` erscheint auf der Uhr beim Schrittwechsel und sagt immer, **was zu tun ist**, mit Dauer oder Distanz
+  (max. ~30 Zeichen): z. B. `Laufen 3 min Race Pace`, `Sled Push 1 min hart`, `2:30 locker joggen/gehen`,
+  `20 min Bike locker`. Endet ein Schritt per Rundentaste, heißt es `… bis Lap-Taste`
+  (z. B. `Ski Erg 1 km bis Lap-Taste`), nie „bis Runde“ oder „dann Runde“ (Wunsch des Nutzers, 20.09.2026).
 - Jeder Abschnitt, bei dem die Uhr piepen soll, ist ein eigener Schritt. Wechselnde Stationen nicht in
   `repeat` packen; `repeat` nur für identische Wiederholungen.
 
