@@ -128,7 +128,8 @@ def materialize_tokens_from_env() -> bool:
     """Schreibt CONCEPT2_TOKENS_B64/CONCEPT2_TOKENS_JSON in die Token-Datei, falls diese fehlt. True = geschrieben."""
     if tokens_present():
         return False
-    blob = os.environ.get("CONCEPT2_TOKENS_B64") or os.environ.get("CONCEPT2_TOKENS_JSON") or ""
+    prefix = "CONCEPT2_DEV_TOKENS" if is_dev() else "CONCEPT2_TOKENS"  # Dev-Modus: eigener Blob, nie der Live-Blob
+    blob = os.environ.get(prefix + "_B64") or os.environ.get(prefix + "_JSON") or ""
     data = _decode_blob(blob)
     if not data:
         return False

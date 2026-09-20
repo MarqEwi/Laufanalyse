@@ -245,6 +245,11 @@ def test_dev_mode_separates_tokens_and_credentials(token_env: Path, monkeypatch:
     monkeypatch.setenv("CONCEPT2_DEV_CLIENT_ID", "dev-id")
     monkeypatch.setenv("CONCEPT2_DEV_CLIENT_SECRET", "dev-sec")
     assert c2.client_credentials() == ("dev-id", "dev-sec")
+    import base64
+    monkeypatch.setenv("CONCEPT2_TOKENS_B64", base64.b64encode(b'{"access_token": "LIVE", "refresh_token": "r"}').decode())
+    assert c2.materialize_tokens_from_env() is False  # Live-Blob wird im Dev-Modus nicht in den Dev-Ordner geschrieben
+    monkeypatch.setenv("CONCEPT2_DEV_TOKENS_B64", base64.b64encode(b'{"access_token": "DEV", "refresh_token": "r"}').decode())
+    assert c2.materialize_tokens_from_env() is True and c2.load_tokens()["access_token"] == "DEV"
 
 
 def test_client_post_and_delete(token_env: Path, monkeypatch: pytest.MonkeyPatch):
