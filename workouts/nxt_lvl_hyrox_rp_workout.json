@@ -1,0 +1,30 @@
+{
+  "name": "NXT LVL Hyrox RP Workout",
+  "sport": "other",
+  "description": "Coach Engelhardt 20.09.2026: SSP RPE 9-10. 20 min locker laufen Z1-Z2, 5 Runden: 3:00 Run RP, 1:00 Station kontrolliert hart, 2:30 Recovery Joggen/Gehen. Stationen: Sled Push, Sled Pull, Burpees, Lunges, Wall Balls. CD 20 min Bike.",
+  "steps": [
+    {"type": "warmup",   "duration_s": 1200, "target": {"hr_bpm": [90, 155]}, "note": "Locker laufen Z1-Z2"},
+
+    {"type": "interval", "duration_s": 180, "note": "Run RP 3 min"},
+    {"type": "interval", "duration_s": 60,  "note": "Sled Push hart"},
+    {"type": "recovery", "duration_s": 150, "note": "Joggen/Gehen locker"},
+
+    {"type": "interval", "duration_s": 180, "note": "Run RP 3 min"},
+    {"type": "interval", "duration_s": 60,  "note": "Sled Pull hart"},
+    {"type": "recovery", "duration_s": 150, "note": "Joggen/Gehen locker"},
+
+    {"type": "interval", "duration_s": 180, "note": "Run RP 3 min"},
+    {"type": "interval", "duration_s": 60,  "note": "Burpees hart"},
+    {"type": "recovery", "duration_s": 150, "note": "Joggen/Gehen locker"},
+
+    {"type": "interval", "duration_s": 180, "note": "Run RP 3 min"},
+    {"type": "interval", "duration_s": 60,  "note": "Lunges hart"},
+    {"type": "recovery", "duration_s": 150, "note": "Joggen/Gehen locker"},
+
+    {"type": "interval", "duration_s": 180, "note": "Run RP 3 min"},
+    {"type": "interval", "duration_s": 60,  "note": "Wall Balls hart"},
+    {"type": "recovery", "duration_s": 150, "note": "Joggen/Gehen locker"},
+
+    {"type": "cooldown", "duration_s": 1200, "note": "Bike easy Cooldown"}
+  ]
+}
