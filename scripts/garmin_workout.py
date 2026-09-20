@@ -16,7 +16,7 @@ Spezifikation (JSON):
 
     {
       "name": "Indoor Cycling NXT LVL",
-      "sport": "cycling",                       # running | cycling | swimming | walking | hiking | other
+      "sport": "cycling",                       # running | cycling | swimming | walking | hiking | cardio | strength | other
       "description": "optional",
       "steps": [
         {"type": "warmup",   "duration_s": 600},                              # ohne Ziel
@@ -52,6 +52,11 @@ SPORTS = {
     "walking": (9, "walking", 4),
     "hiking": (3, "hiking", 5),
     "other": (3, "other", 13),
+    # Geprüft am 20.09.2026 an vorhandenen Workouts des Kontos: EMOM (Cardio) = 6, NXT LVL 2.0 (Kraft) = 5.
+    # Auf der Uhr erscheinen Workouts nur im Profil ihrer Sportart unter Training → Meine Workouts;
+    # "other" taucht dort nicht auf, nur über den Kalender. Hyrox/Stationen deshalb als "cardio" anlegen.
+    "cardio": (6, "cardio_training", 6),
+    "strength": (5, "strength_training", 4),
 }
 STEP_TYPES = {"warmup": 1, "cooldown": 2, "interval": 3, "recovery": 4, "rest": 5, "repeat": 6}
 STEP_LABEL = {

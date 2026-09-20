@@ -99,7 +99,7 @@ vorhandenen Workouts des Kontos:
 
 | Element | Garmin-JSON |
 |---|---|
-| Sportart | `sportType` `{sportTypeId, sportTypeKey}`: running=1, cycling=2, other=3 (Rudern), swimming=4, walking=9 |
+| Sportart | `sportType` `{sportTypeId, sportTypeKey}`: running=1, cycling=2, other=3, swimming=4, strength_training=5, cardio_training=6, walking=9. **Uhr (Fenix 5X Plus, geprüft 20.09.2026):** Unter Training → Meine Workouts listet ein Profil nur Workouts seiner Sportart (Laufen ↔ running, Rad ↔ cycling, Cardio ↔ cardio_training, Kraft ↔ strength_training). `other` erscheint dort nicht, nur als Kalender-Workout des Tages. Einen „An Gerät senden“-Endpunkt hat die API nicht (`/workout-service/workout/{id}/sendtodevice/{deviceId}` und drei Varianten → 404); Geräte-IDs liefert `get_devices`. |
 | Schritt | `ExecutableStepDTO` mit `stepType` (warmup=1, cooldown=2, interval=3, recovery=4, rest=5), `endCondition` (lap.button=1, time=2 in s, distance=3 in m), `targetType` |
 | Ziel HF-Bereich | `heart.rate.zone` (id 4) mit `targetValueOne`/`targetValueTwo` in bpm, `zoneNumber` null |
 | Ziel HF-Zone | `heart.rate.zone` mit `zoneNumber` 1–5, Werte null |

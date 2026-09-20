@@ -348,7 +348,7 @@ def get_workout(workout_id: int) -> dict[str, Any]:
 def create_workout(spec: dict[str, Any], schedule_date: str | None = None, dry_run: bool = False) -> dict[str, Any]:
     """Workout aus einer Spezifikation anlegen (Schreibzugriff!) und optional im Kalender terminieren.
 
-    spec = {"name": str, "sport": "running|cycling|swimming|walking|hiking|other", "description": str?,
+    spec = {"name": str, "sport": "running|cycling|swimming|walking|hiking|cardio|strength|other", "description": str?,
             "steps": [ {"type": "warmup|interval|recovery|rest|cooldown", "duration_s": 120 | "distance_m": 1000 | "end": "lap",
                         "target": {"hr_bpm": [90, 130]} | {"hr_zone": 2} | {"pace_min_km": ["4:10", "4:20"]} | null,
                         "note": "Text auf der Uhr"?},

@@ -42,8 +42,13 @@ Datenquelle und Ziel ist der MCP-Server `garmin` (Tools `mcp__garmin__*`). Die W
 }
 ```
 
-- `sport`: `running` (Laufen), `cycling` (Rad, auch indoor), `swimming`, `walking`, `hiking`, `other`
-  (benutzerdefiniert: Hyrox, Stationen, Rudern, Kraft).
+- `sport`: `running` (Laufen), `cycling` (Rad, auch indoor), `swimming`, `walking`, `hiking`, `cardio`
+  (Hyrox, Stationen, Rudern, EMOM), `strength` (Kraft), `other` (benutzerdefiniert).
+  **Wichtig für die Uhr (Fenix 5X Plus):** Unter Training → Meine Workouts zeigt ein Profil nur Workouts seiner
+  eigenen Sportart. `other` erscheint nirgends in dieser Liste, sondern nur als Kalender-Workout des Tages.
+  Deshalb Hyrox/Stationen/Rudern immer als `cardio` anlegen (Profil Cardio bzw. ein davon kopiertes eigenes
+  Profil „Hyrox“), Läufe als `running`, Rad als `cycling`. Ein „An Gerät senden“ gibt es in der API nicht
+  (geprüft 20.09.2026); der Sync passiert über die Garmin-Connect-App.
 - Schritt-Typen: `warmup`, `interval` (Belastung), `recovery`, `rest`, `cooldown`. Ende: `duration_s`,
   `distance_m` oder `"end": "lap"` (Rundentaste).
 - Ziele: `hr_bpm [low, high]`, `hr_zone 1–5`, `pace_min_km ["schnell", "langsam"]` (nur Laufen/Gehen),
