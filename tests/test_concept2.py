@@ -283,7 +283,19 @@ def test_compact_and_bike_pace():
     assert set(c) >= {"result_id", "date", "type", "distance_m", "time_str", "pace_str", "hr_avg"}
     bike = {"id": 1, "date": "2026-09-01 10:00:00", "type": "bike", "distance": 10000, "time": 12000, "heart_rate": {}}
     s = ce.normalize_summary(bike)
-    assert s["pace_unit_m"] == 1000 and s["pace_str"] == "2:00.0" and s["watts"] is None
+    assert s["pace_unit_m"] == 1000 and s["pace_str"] == "2:00.0" and round(s["watts"]) == 203
+
+
+def test_bike_watts_match_concept2_validator():
+    """API Workout Validator (log-dev, 20.09.2026): Bike 1 → 171 W gesamt, Splits 139/184/182/181/174 W."""
+    spec = {"type": "bike", "date": "2026-09-20 15:28", "splits": [
+        {"time": "4:32.2", "distance": 2000, "spm": 66}, {"time": "4:07.6", "distance": 2000, "spm": 72},
+        {"time": "4:08.8", "distance": 2000, "spm": 72}, {"time": "4:09.2", "distance": 2000, "spm": 72}, {"time": "4:12.3", "distance": 2000, "spm": 71}]}
+    a, _ = ce.analyze(ce.manual_to_result(spec), None)
+    assert round(a["summary"]["watts"]) == 171
+    assert [round(s["watts"]) for s in a["splits"]] == [139, 184, 182, 181, 174]
+    body = ce.upload_body(ce.manual_to_result({**spec, "stroke_count": 1494, "drag_factor": 102}))
+    assert body["stroke_count"] == 1494 and body["drag_factor"] == 102
 
 
 # ----------------------------------------------------------------------------

@@ -94,11 +94,13 @@ def pace_from(dist_m: float | None, time_s: float | None, unit_m: int = 500) -> 
     return time_s / (dist_m / unit_m)
 
 
-def watts_from_pace(pace_s_per_500m: float | None) -> float | None:
-    """Concept2-Formel: Watt = 2,8 / (Pace je Meter)^3 – nur RowErg/SkiErg."""
-    if not pace_s_per_500m or pace_s_per_500m <= 0:
+def watts_from_pace(pace_s: float | None) -> float | None:
+    """Concept2-Formel: Watt = 2,8 / (Pace/500)^3. RowErg/SkiErg: Pace je 500 m. BikeErg: Concept2 setzt die
+    Pace je 1000 m in dieselbe Formel ein (am API-Validator geprüft 20.09.2026: 2:07,0 /km → 171 W, Splits
+    2:16,1 → 139 W, 2:03,8 → 184 W)."""
+    if not pace_s or pace_s <= 0:
         return None
-    return 2.8 / (pace_s_per_500m / 500.0) ** 3
+    return 2.8 / (pace_s / 500.0) ** 3
 
 
 # ----------------------------------------------------------------------------
@@ -142,7 +144,7 @@ def normalize_summary(r: dict[str, Any]) -> dict[str, Any]:
         "pace_unit_m": unit,
         "pace_s": pace,
         "pace_str": fmt_pace(pace),
-        "watts": watts_from_pace(pace) if unit == 500 else None,
+        "watts": watts_from_pace(pace),
         "spm": r.get("stroke_rate"),
         "stroke_count": r.get("stroke_count"),
         "calories": r.get("calories_total"),
@@ -170,7 +172,7 @@ def normalize_segments(r: dict[str, Any], type_key: str | None) -> tuple[list[di
             out.append({
                 "nr": i, "kind": kind, "type": it.get("type"), "start_s": round(start, 1), "end_s": round(start + time_s, 1),
                 "time_s": time_s, "time_str": fmt_time(time_s), "distance_m": dist,
-                "pace_s": p, "pace_str": fmt_pace(p), "watts": watts_from_pace(p) if unit == 500 else None,
+                "pace_s": p, "pace_str": fmt_pace(p), "watts": watts_from_pace(p),
                 "spm": it.get("stroke_rate"), "hr_avg": hr["avg"], "hr_min": hr["min"], "hr_max": hr["max"], "hr_end": hr["end"],
                 "rest_time_s": rest_s, "rest_distance_m": float(it.get("rest_distance") or 0), "calories": it.get("calories_total"),
                 "machine": it.get("machine"),
@@ -319,7 +321,7 @@ def analyze(result: dict[str, Any], strokes_raw: list[dict[str, Any]] | None, rp
             "same_distance": same_dist,
             "avg_time_s": _mean([w["time_s"] for w in work]),
             "avg_pace_s": _mean(paces), "avg_pace_str": fmt_pace(_mean(paces)),
-            "avg_watts": _mean([w["watts"] for w in work if w.get("watts")]) if unit == 500 else None,
+            "avg_watts": _mean([w["watts"] for w in work if w.get("watts")]),
             "pace_stdev_s": statistics.pstdev(paces) if len(paces) > 1 else 0.0,
             "pace_min_s": min(paces) if paces else None, "pace_max_s": max(paces) if paces else None,
             "pace_trend_s_per_interval": _slope(paces),
@@ -534,14 +536,14 @@ def manual_to_result(spec: dict[str, Any]) -> dict[str, Any]:
     return {
         "id": rid, "date": date, "timezone": spec.get("timezone", "Europe/Berlin"), "type": t, "distance": dist, "time": time_t,
         "time_formatted": fmt_time(time_t / 10), "workout_type": wt, "source": spec.get("source", "PM5-Foto (manuell)"),
-        "verified": False, "stroke_rate": spm, "drag_factor": spec.get("drag_factor"), "rest_time": rest_t,
+        "verified": False, "stroke_rate": spm, "stroke_count": spec.get("stroke_count"), "drag_factor": spec.get("drag_factor"), "rest_time": rest_t,
         "rest_distance": sum(s.get("rest_distance") or 0 for s in intervals), "stroke_data": False,
         "heart_rate": hr, "comments": spec.get("comments"), "workout": {"splits": splits, "intervals": intervals},
     }
 
 
 UPLOAD_FIELDS = ("type", "date", "timezone", "distance", "time", "rest_time", "rest_distance", "workout_type", "stroke_rate",
-                 "drag_factor", "comments", "heart_rate", "workout")
+                 "stroke_count", "drag_factor", "comments", "heart_rate", "workout")  # stroke_count/drag_factor: vom Validator empfohlen
 
 
 def upload_body(result: dict[str, Any], *, weight_class: str = "H", verified: bool = False) -> dict[str, Any]:

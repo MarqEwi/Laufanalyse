@@ -25,7 +25,9 @@ Header: `Authorization: Bearer <access_token>`, `Accept: application/vnd.c2logbo
 abgelaufen (wird automatisch erneuert), 403 = Scope fehlt, 429 = zu viele Anfragen.
 
 Umrechnung im Skript: Zeiten /10 → Sekunden, Pace je 500 m aus Distanz/Zeit (Bike Erg je 1000 m), Watt nach
-Concept2-Formel `2,8 / (Pace je Meter)³` (nur RowErg/SkiErg).
+Concept2-Formel `2,8 / (Pace/500)³`; beim BikeErg setzt Concept2 die Pace je 1000 m in dieselbe Formel ein
+(API-Validator 20.09.2026: 2:07,0 /km → 171 W). Der Validator mit „Strict Checking“ hat unsere Upload-Bodies
+(Ski Erg mit Intervallen, Bike mit Splits) als gültig bestätigt und empfiehlt optional `stroke_count` und `drag_factor`.
 
 ## 2. Zugang einrichten (einmalig)
 
