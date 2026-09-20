@@ -46,3 +46,6 @@ desktop.ini
 .idea/
 .vscode/
 *.swp
+
+# Vorlage ohne Secrets für den NAS-Sync-Container
+!nas/training-sync/.env.example
