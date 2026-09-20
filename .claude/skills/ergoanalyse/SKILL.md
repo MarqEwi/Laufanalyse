@@ -55,6 +55,10 @@ Schickt der Nutzer Fotos der PM5-„Detail Anzeige“ (Gerät ohne ErgData-Verbi
    `hr_avg`/`hr_max` je Abschnitt aus Garmin (Zeitfenster wie in `docs/concept2-tools.md` Abschnitt 5 beschrieben).
 4. Prüfen, dass die berechnete Gesamtzeit und Distanz mit der Gesamtzeile des PM5 übereinstimmen; Abweichung
    nennen. Die Einheit landet unter `data/concept2/<datum>_foto-…/`, Quelle „PM5-Foto“, nicht im Logbook.
+5. Ins Logbook schreiben nur auf Wunsch und nur, wenn die App Schreibrecht hat (`docs/concept2-tools.md`,
+   Abschnitt 3): `concept2_upload_manual(spec)` zeigt den Body (dry_run), nach Bestätigung `dry_run=false`;
+   Antwort 404 „User not found“ heißt: kein Schreibrecht auf diesem Logbook. Testeinträge im Test-Logbook
+   nach dem Test mit `concept2_delete_result` entfernen, wenn der Nutzer das will.
 
 ## Nachfragen und Vergleiche
 

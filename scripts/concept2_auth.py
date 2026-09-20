@@ -80,9 +80,17 @@ def token_endpoint() -> str:
     return f"https://{host()}/oauth/access_token"
 
 
+def is_dev() -> bool:
+    return host().startswith("log-dev")
+
+
 def token_dir() -> Path:
-    raw = os.environ.get("CONCEPT2_TOKENS")
-    return Path(raw).expanduser() if raw else DEFAULT_TOKEN_DIR
+    """Token-Ordner; das Test-Logbook (CONCEPT2_DEV=1) bekommt einen eigenen Ordner (~/.concept2-dev),
+    damit Live- und Dev-Tokens nie vermischt werden."""
+    raw = os.environ.get("CONCEPT2_DEV_TOKENS") if is_dev() else os.environ.get("CONCEPT2_TOKENS")
+    if raw:
+        return Path(raw).expanduser()
+    return Path(str(DEFAULT_TOKEN_DIR) + "-dev") if is_dev() else DEFAULT_TOKEN_DIR
 
 
 def token_file() -> Path:
@@ -166,14 +174,16 @@ def token_blob_b64() -> str:
 
 
 def client_credentials(tokens: dict[str, Any] | None = None) -> tuple[str, str]:
-    """Client-ID und -Secret: Umgebungsvariablen vor Token-Datei."""
+    """Client-ID und -Secret: Umgebungsvariablen vor Token-Datei. Für das Test-Logbook (CONCEPT2_DEV=1) gelten
+    CONCEPT2_DEV_CLIENT_ID/_SECRET; die Live-Variablen werden dort bewusst ignoriert (eigene App auf log-dev)."""
     tokens = tokens if tokens is not None else (load_tokens() or {})
-    cid = os.environ.get("CONCEPT2_CLIENT_ID", "").strip() or str(tokens.get("client_id") or "")
-    sec = os.environ.get("CONCEPT2_CLIENT_SECRET", "").strip() or str(tokens.get("client_secret") or "")
+    prefix = "CONCEPT2_DEV_CLIENT_" if is_dev() else "CONCEPT2_CLIENT_"
+    cid = os.environ.get(prefix + "ID", "").strip() or str(tokens.get("client_id") or "")
+    sec = os.environ.get(prefix + "SECRET", "").strip() or str(tokens.get("client_secret") or "")
     if not cid or not sec:
         raise Concept2AuthError(
-            "CONCEPT2_CLIENT_ID und CONCEPT2_CLIENT_SECRET fehlen. App unter "
-            "https://log.concept2.com/developers/keys registrieren und die Werte als Umgebungsvariablen setzen."
+            f"{prefix}ID und {prefix}SECRET fehlen. App unter https://{host()}/developers/keys registrieren "
+            "und die Werte als Umgebungsvariablen setzen (oder in der Token-Datei ablegen)."
         )
     return cid, sec
 
@@ -333,11 +343,21 @@ class Concept2Client:
         self.timeout_s = timeout_s
 
     def get(self, path: str, params: dict[str, Any] | None = None, *, raw: bool = False) -> Any:
+        return self.request("GET", path, params=params, raw=raw)
+
+    def post(self, path: str, body: dict[str, Any]) -> Any:
+        """Schreibzugriff (Scope results:write). Live nur mit von Concept2 freigeschalteter App."""
+        return self.request("POST", path, body=body)
+
+    def delete(self, path: str) -> Any:
+        return self.request("DELETE", path)
+
+    def request(self, method: str, path: str, params: dict[str, Any] | None = None, body: dict[str, Any] | None = None, *, raw: bool = False) -> Any:
         url = path if path.startswith("http") else f"{api_base()}/{path.lstrip('/')}"
         params = {k: v for k, v in (params or {}).items() if v is not None}
         for attempt in (1, 2):
             tok = access_token(force_refresh=(attempt == 2))
-            r = self._s.get(url, params=params, headers={"Authorization": f"Bearer {tok}"}, timeout=self.timeout_s)
+            r = self._s.request(method, url, params=params, json=body, headers={"Authorization": f"Bearer {tok}"}, timeout=self.timeout_s)
             if r.status_code == 401 and attempt == 1:
                 continue
             break
@@ -353,10 +373,21 @@ class Concept2Client:
             raise Concept2ApiError(f"Concept2-API-Fehler HTTP {r.status_code} bei {path}: {detail}{hint}", r.status_code)
         if raw:
             return r.content
+        if r.status_code == 204 or not r.content:
+            return {}
         try:
             return r.json()
         except ValueError as exc:
             raise Concept2ApiError(f"Concept2-API: keine JSON-Antwort bei {path}") from exc
+
+    # --- Schreib-Endpunkte (geprüft 20.09.2026 am Test-Logbook) --------------
+
+    def create_result(self, body: dict[str, Any]) -> dict[str, Any]:
+        """POST /users/me/results → angelegtes Result (data). Antwort 201; 404 'User not found' = kein Schreibrecht."""
+        return self.post("users/me/results", body).get("data") or {}
+
+    def delete_result(self, result_id: int) -> None:
+        self.delete(f"users/me/results/{result_id}")
 
     # --- Endpunkte ---------------------------------------------------------
 

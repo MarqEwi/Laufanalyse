@@ -540,6 +540,39 @@ def manual_to_result(spec: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+UPLOAD_FIELDS = ("type", "date", "timezone", "distance", "time", "rest_time", "rest_distance", "workout_type", "stroke_rate",
+                 "drag_factor", "comments", "heart_rate", "workout")
+
+
+def upload_body(result: dict[str, Any], *, weight_class: str = "H", verified: bool = False) -> dict[str, Any]:
+    """Result (aus manual_to_result) in den Body für POST /users/me/results umwandeln (Format des API Workout
+    Validators; geprüft 20.09.2026 am Test-Logbook, Result 86969). Leere Felder werden weggelassen."""
+    body: dict[str, Any] = {}
+    for k in UPLOAD_FIELDS:
+        v = result.get(k)
+        if v in (None, "", {}, []):
+            continue
+        body[k] = v
+    w = body.get("workout") or {}
+    body["workout"] = {k: [{kk: vv for kk, vv in seg.items() if vv not in (None, {}, "")} for seg in v] for k, v in w.items() if v}
+    if not body["workout"]:
+        body.pop("workout")
+    body["weight_class"] = weight_class
+    body["verified"] = verified
+    return body
+
+
+def upload_manual(client: c2.Concept2Client, spec: dict[str, Any]) -> dict[str, Any]:
+    """Abgelesene PM5-Einheit ins Logbook schreiben (Live nur mit freigeschalteter App). Liest zur Kontrolle zurück."""
+    body = upload_body(manual_to_result(spec))
+    created = client.create_result(body)
+    rid = created.get("id")
+    check = client.result(int(rid)) if rid else {}
+    w = (check.get("workout") or {}) if check else {}
+    return {"result_id": rid, "host": c2.host(), "body": body, "readback": compact(check) if check else None,
+            "segments_readback": (len(w.get("intervals") or []) or len(w.get("splits") or [])) if check else None}
+
+
 def analyze_manual(spec: dict[str, Any], *, rpe: float | None, out_dir: str | None) -> tuple[Path, dict[str, Any]]:
     """Wie export_and_analyze, aber aus abgelesenen Werten statt aus der API. Sichert unter <out>/<datum>_<id>/."""
     result = manual_to_result(spec)
@@ -681,6 +714,7 @@ def main() -> int:
     ap.add_argument("--type", dest="type_", choices=sorted(TYPE_DE), help="Gerät, z. B. rower, skierg, bike")
     ap.add_argument("--rpe", type=float, help="RPE des Nutzers für Bericht und Coach-Text")
     ap.add_argument("--manual", metavar="SPEC.json", help="abgelesene PM5-Werte (JSON, siehe manual_to_result) statt API auswerten")
+    ap.add_argument("--upload", action="store_true", help="mit --manual: Einheit zusätzlich ins Logbook schreiben (Schreibrecht nötig; CONCEPT2_DEV=1 = Test-Logbook)")
     ap.add_argument("--list", type=int, metavar="N", help="letzte N Einheiten anzeigen")
     ap.add_argument("--exported", action="store_true", help="bereits gesicherte Einheiten auflisten")
     ap.add_argument("--out", help="Ausgabe-Ordner (Standard $CONCEPT2_DATA_DIR oder ./data/concept2)")
@@ -702,6 +736,13 @@ def main() -> int:
         if a.print:
             print(render_markdown(analysis))
             print(coach_text(analysis))
+        if a.upload:
+            try:
+                up = upload_manual(c2.connect(), spec)
+            except (c2.Concept2AuthError, c2.Concept2ApiError) as exc:
+                print(f"Upload fehlgeschlagen: {exc}", file=sys.stderr)
+                return 1
+            print(f"Hochgeladen nach {up['host']}: Result-ID {up['result_id']} ({up['segments_readback']} Abschnitte zurückgelesen)")
         return 0
     try:
         client = c2.connect()

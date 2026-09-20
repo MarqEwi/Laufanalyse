@@ -563,6 +563,29 @@ def concept2_analyze_manual(spec: dict[str, Any], rpe: float | None = None, out_
 
 
 @mcp_server.tool()
+def concept2_upload_manual(spec: dict[str, Any], dry_run: bool = True) -> dict[str, Any]:
+    """Abgelesene PM5-Einheit (spec wie bei concept2_analyze_manual) ins Concept2-Logbook schreiben (Schreibzugriff!).
+    dry_run=True (Standard) zeigt nur den Body, der gesendet würde. Erst nach Bestätigung des Nutzers mit
+    dry_run=False aufrufen. Ziel ist das Logbook der laufenden Umgebung: Live (log.concept2.com) nur mit einer von
+    Concept2 freigeschalteten Schreib-App, sonst kommt 404 'User not found'; mit CONCEPT2_DEV=1 das Test-Logbook.
+    Rückgabe: host, body, bei Upload result_id und readback (zur Kontrolle zurückgelesen)."""
+    try:
+        body = ce.upload_body(ce.manual_to_result(spec))
+    except ValueError as exc:
+        raise RuntimeError(f"Manuelle Einheit: {exc}") from exc
+    if dry_run:
+        return {"host": c2.host(), "dry_run": True, "body": body}
+    return _c2_call(ce.upload_manual, _c2_or_raise(), spec)
+
+
+@mcp_server.tool()
+def concept2_delete_result(result_id: int) -> dict[str, Any]:
+    """Result aus dem Logbook löschen (Schreibzugriff, nur auf ausdrücklichen Wunsch des Nutzers; z. B. Testeinträge)."""
+    _c2_call(_c2_or_raise().delete_result, result_id)
+    return {"result_id": result_id, "host": c2.host(), "deleted": True}
+
+
+@mcp_server.tool()
 def concept2_list_exported(out_dir: str | None = None) -> list[dict[str, Any]]:
     """Bereits gesicherte Ergometer-Einheiten (Ordner, Datum, ID, Gerät, Distanz, Zeit, Pace, Ø-HF, Intervalle) – für Vergleiche ohne API."""
     return ce.list_exported(ce.base_dir(out_dir))

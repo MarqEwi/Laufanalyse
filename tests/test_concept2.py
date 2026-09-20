@@ -217,6 +217,61 @@ def test_manual_bike_splits_and_errors():
         ce.manual_to_result({"type": "rower", "date": "2026-09-20 10:00"})
 
 
+def test_upload_body_matches_validator_format():
+    spec = {"type": "skierg", "date": "2026-09-20 16:09", "intervals": [
+        {"time": "4:17.1", "distance": 1000, "spm": 43, "rest": "4:50", "rest_distance": 13},
+        {"time": "4:12.7", "distance": 1000, "spm": 39, "rest": "5:03", "rest_distance": 17}], "comments": "x"}
+    body = ce.upload_body(ce.manual_to_result(spec))
+    assert body["type"] == "skierg" and body["date"] == "2026-09-20 16:09:00" and body["timezone"] == "Europe/Berlin"
+    assert body["distance"] == 2000 and body["time"] == 5098 and body["rest_time"] == 5930 and body["rest_distance"] == 30
+    assert body["workout_type"] == "VariableInterval" and body["weight_class"] == "H" and body["verified"] is False
+    assert "id" not in body and "time_formatted" not in body and "source" not in body and "heart_rate" not in body
+    iv = body["workout"]["intervals"]
+    assert iv[0] == {"type": "distance", "time": 2571, "distance": 1000, "stroke_rate": 43, "rest_time": 2900, "rest_distance": 13}
+    assert "heart_rate" not in iv[0] and "calories_total" not in iv[0]
+
+
+def test_dev_mode_separates_tokens_and_credentials(token_env: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("CONCEPT2_CLIENT_ID", "live-id")
+    monkeypatch.setenv("CONCEPT2_CLIENT_SECRET", "live-sec")
+    assert c2.client_credentials() == ("live-id", "live-sec")
+    monkeypatch.setenv("CONCEPT2_DEV", "1")
+    monkeypatch.delenv("CONCEPT2_DEV_TOKENS", raising=False)
+    assert c2.is_dev() and c2.token_dir() != token_env and c2.token_dir().name.endswith("-dev")
+    monkeypatch.setenv("CONCEPT2_DEV_TOKENS", str(token_env / "devtok"))  # leerer Ordner, keine echten Dev-Tokens
+    assert c2.token_dir() == token_env / "devtok"
+    with pytest.raises(c2.Concept2AuthError, match="CONCEPT2_DEV_CLIENT_ID"):
+        c2.client_credentials()  # Live-Variablen werden im Dev-Modus ignoriert
+    monkeypatch.setenv("CONCEPT2_DEV_CLIENT_ID", "dev-id")
+    monkeypatch.setenv("CONCEPT2_DEV_CLIENT_SECRET", "dev-sec")
+    assert c2.client_credentials() == ("dev-id", "dev-sec")
+
+
+def test_client_post_and_delete(token_env: Path, monkeypatch: pytest.MonkeyPatch):
+    c2.save_tokens({"access_token": "t1", "refresh_token": "r", "expires_at": time.time() + 3600, "client_id": "cid", "client_secret": "sec"})
+    calls: list[tuple] = []
+
+    class Resp:
+        def __init__(self, status, payload=None):
+            self.status_code, self._p = status, payload
+            self.content = b"" if payload is None else b"x"
+            self.text = json.dumps(payload or {})
+
+        def json(self):
+            return self._p
+
+    class FakeSession:
+        def request(self, method, url, params=None, json=None, headers=None, timeout=None):
+            calls.append((method, url, json))
+            return Resp(201, {"data": {"id": 86969, **json}}) if method == "POST" else Resp(204)
+
+    client = c2.Concept2Client.__new__(c2.Concept2Client)
+    client._s, client.timeout_s = FakeSession(), 5
+    created = client.create_result({"type": "rower", "distance": 500})
+    assert created["id"] == 86969 and calls[0][0] == "POST" and calls[0][1].endswith("/users/me/results")
+    assert client.delete_result(86969) is None and calls[1][0] == "DELETE" and calls[1][1].endswith("/users/me/results/86969")
+
+
 def test_compact_and_bike_pace():
     res = _load("result_steady.json")["data"]
     c = ce.compact(res)
@@ -323,7 +378,7 @@ def test_client_retries_once_on_401(token_env: Path, monkeypatch: pytest.MonkeyP
 
     class Resp:
         def __init__(self, status, payload):
-            self.status_code, self._p, self.text, self.content = status, payload, json.dumps(payload), b""
+            self.status_code, self._p, self.text, self.content = status, payload, json.dumps(payload), b"x"
 
         def json(self):
             return self._p
@@ -333,7 +388,7 @@ def test_client_retries_once_on_401(token_env: Path, monkeypatch: pytest.MonkeyP
     class FakeSession:
         headers: dict = {}
 
-        def get(self, url, params=None, headers=None, timeout=None):
+        def request(self, method, url, params=None, json=None, headers=None, timeout=None):
             seen.append(headers["Authorization"])
             return Resp(401, {"message": "expired"}) if headers["Authorization"].endswith("t1") else Resp(200, {"data": {"username": "marq", "first_name": "Marq"}})
 

@@ -80,16 +80,29 @@ wiederholen (Session-Weg oben oder `concept2_login.py --force` am PC), dann `CON
 | `concept2_get_result` | `result_id` | `summary` (normalisiert), `splits[]`, `intervals[]` (je: `nr`, `start_s`, `time_s`, `distance_m`, `pace_s`/`pace_str`, `watts`, `spm`, `hr_avg`, `hr_max`, `hr_end`, `rest_time_s`), `raw` |
 | `concept2_analyze_result` | `result_id`?, `date`?, `type`?, `rpe`?, `out_dir`? (nichts = letzte Einheit) | `output_dir`, `summary_md` (Bericht), `coach_text` (Pace/HF/RPE als Textbaustein), `analysis` (`summary`, `segments` mit `hr_start_strokes`/`hr_end_strokes`/`hr_rise`, `intervals_stats`: Anzahl, Ø-Pace, Streuung, Spanne, Trend, Ø-HF, HF-Anstieg, `notes`) |
 | `concept2_analyze_manual` | `spec` (abgelesene PM5-Werte: `type`, `date` = Endzeit, `intervals`/`splits` mit `time` „m:ss.z“, `distance`, `spm`, `rest`, optional `hr_avg`/`hr_max`), `rpe`?, `out_dir`? | wie `concept2_analyze_result`, aber aus Fotowerten; Gesamtwerte berechnet, Quelle „PM5-Foto“, Ordner `<datum>_foto-<datum-zeit>/` mit `raw/manual_spec.json` |
+| `concept2_upload_manual` | `spec` (wie oben), `dry_run`=true | Schreibzugriff: Body zeigen bzw. Result anlegen und zurücklesen (`result_id`, `readback`); Ziel je nach `CONCEPT2_DEV` |
+| `concept2_delete_result` | `result_id` | Schreibzugriff: Result löschen (nur auf Wunsch, z. B. Testeinträge) |
 | `concept2_list_exported` | `out_dir`? | gesicherte Einheiten mit Kennzahlen (Vergleiche ohne API) |
 
 CLI am PC (gleiche Logik): `uv run scripts/concept2_export.py [--id … | --date … | --type skierg] [--rpe 7] [--print]`,
 `--list 10`, `--exported`, `--manual spec.json` (PM5-Foto).
 
-**Schreibzugriff (Ergebnisse ins Logbook hochladen):** Die API hat `POST /users/me/results` im Format des
-„API Workout Validator“ (Scope `results:write`). Für das echte Logbook werden neuen Apps nur `user:read`
-und `results:read` gewährt; Schreibrechte müssen laut Schlüsselseite über das Test-Logbook
-`log-dev.concept2.com` entwickelt und von Concept2 freigeschaltet werden (Stand 20.09.2026, nicht beantragt).
-Bis dahin: Einheiten vom Foto mit `concept2_analyze_manual` nur lokal auswerten oder im Logbook unter
+**Schreibzugriff (Ergebnisse ins Logbook hochladen), live geprüft 20.09.2026 am Test-Logbook:**
+`POST /users/me/results` mit dem Body aus `upload_body()` (Format des „API Workout Validator“: `type`, `date`,
+`timezone`, `distance`, `time`/`rest_time` in Zehntelsekunden, `workout_type`, `stroke_rate`, `weight_class`,
+`workout.intervals[]` mit `type`, `time`, `distance`, `stroke_rate`, `rest_time`, `rest_distance`) → 201 mit dem
+angelegten Result (Test: ID 86969, 5 Intervalle und Pausen kamen beim Rücklesen exakt zurück; `source` wird von
+Concept2 auf den App-Namen gesetzt, `time_formatted` zeigt Arbeit + Pausen). Ohne Schreibrecht antwortet die API
+mit **404 „User not found“**, nicht 403. `DELETE /users/me/results/{id}` löscht.
+
+Rechte: Auf dem echten Logbook bekommen neue Apps nur `user:read`, `results:read`; Schreib-Apps werden auf
+`log-dev.concept2.com` entwickelt (dort ist `results:write` frei wählbar) und müssen von Concept2 für das
+Live-Logbook freigeschaltet werden (Stand 20.09.2026: Dev-App „Laufanalyse Claude Dev“ angelegt, Freischaltung
+noch nicht beantragt). Test-Logbook nutzen: `CONCEPT2_DEV=1`, eigene App-Daten in `CONCEPT2_DEV_CLIENT_ID` /
+`CONCEPT2_DEV_CLIENT_SECRET` (die Live-Variablen werden im Dev-Modus ignoriert), eigener Token-Ordner
+`~/.concept2-dev` bzw. `CONCEPT2_DEV_TOKENS`; Domain `log-dev.concept2.com` in der Netzwerk-Policy. Tools:
+`concept2_upload_manual(spec, dry_run)` und `concept2_delete_result`; CLI `--manual spec.json --upload`.
+Bis zur Freischaltung: Einheiten vom Foto mit `concept2_analyze_manual` lokal auswerten oder im Logbook unter
 „Add Workout“ von Hand eintragen.
 
 ## 4. Datenstruktur (`data/concept2/<datum>_<result_id>/`)

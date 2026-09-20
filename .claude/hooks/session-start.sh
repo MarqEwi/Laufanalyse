@@ -47,6 +47,8 @@ elif garmin_auth.tokens_present():
     print("Garmin-Tokens vorhanden.")
 else:
     print("Hinweis: keine Garmin-Tokens (GARMIN_TOKENS_B64 in der Cloud-Umgebung setzen).")
+import os
+os.environ.pop("CONCEPT2_DEV", None)  # Hook schreibt immer die Live-Tokens
 import concept2_auth
 if concept2_auth.materialize_tokens_from_env():
     print(f"Concept2-Tokens aus CONCEPT2_TOKENS_B64 nach {concept2_auth.token_file()} geschrieben.")
