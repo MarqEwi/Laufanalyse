@@ -4,7 +4,7 @@
 # ///
 """Einmalige Autorisierung beim Concept2 Logbook (OAuth2) und Smoke-Test.
 
-Voraussetzung: App unter https://log.concept2.com/developers registriert, Redirect-URI dort
+Voraussetzung: App unter https://log.concept2.com/developers/keys registriert, Redirect-URI dort
 = http://localhost:8765/callback (oder CONCEPT2_REDIRECT_URI), und CONCEPT2_CLIENT_ID /
 CONCEPT2_CLIENT_SECRET als Umgebungsvariablen gesetzt.
 

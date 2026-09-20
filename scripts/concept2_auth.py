@@ -1,7 +1,7 @@
 """Anmeldung am Concept2 Logbook (OAuth2) für die Skripte und den MCP-Server in diesem Ordner.
 
 Das Logbook (log.concept2.com) bekommt die Einheiten von ErgData/PM5 und stellt sie über eine
-offizielle REST-API bereit. Zugang: eigene App unter https://log.concept2.com/developers registrieren
+offizielle REST-API bereit. Zugang: eigene App unter https://log.concept2.com/developers/keys registrieren
 (Client-ID + Client-Secret, Redirect-URI wie unten), dann einmal per Browser autorisieren
 (scripts/concept2_login.py). Danach läuft alles über Access-/Refresh-Token ohne Browser.
 
@@ -169,7 +169,7 @@ def client_credentials(tokens: dict[str, Any] | None = None) -> tuple[str, str]:
     if not cid or not sec:
         raise Concept2AuthError(
             "CONCEPT2_CLIENT_ID und CONCEPT2_CLIENT_SECRET fehlen. App unter "
-            "https://log.concept2.com/developers registrieren und die Werte als Umgebungsvariablen setzen."
+            "https://log.concept2.com/developers/keys registrieren und die Werte als Umgebungsvariablen setzen."
         )
     return cid, sec
 

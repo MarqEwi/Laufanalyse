@@ -3,7 +3,7 @@
   Richtet die Concept2-Logbook-Anbindung auf dem Windows-PC ein (einmalig).
 
 .DESCRIPTION
-  1. fragt Client-ID und Client-Secret der bei https://log.concept2.com/developers registrierten App ab
+  1. fragt Client-ID und Client-Secret der bei https://log.concept2.com/developers/keys registrierten App ab
      (Redirect-URI dort: http://localhost:8765/callback)
   2. setzt die Benutzer-Umgebungsvariablen CONCEPT2_CLIENT_ID, CONCEPT2_CLIENT_SECRET, CONCEPT2_TOKENS,
      CONCEPT2_DATA_DIR (Registry HKCU\Environment, keine Datei im Repo)

@@ -26,7 +26,7 @@ Concept2-Formel `2,8 / (Pace je Meter)³` (nur RowErg/SkiErg).
 
 ## 2. Zugang einrichten (einmalig)
 
-1. **App registrieren:** https://log.concept2.com/developers → neue Anwendung, Redirect-URI
+1. **App registrieren:** https://log.concept2.com/developers/keys → neue Anwendung, Redirect-URI
    `http://localhost:8765/callback`. Ergebnis: Client-ID und Client-Secret.
 2. **PC:** `scripts/setup-concept2.ps1` ausführen (fragt Client-ID/-Secret ab, setzt die Benutzer-Umgebungsvariablen
    `CONCEPT2_CLIENT_ID`, `CONCEPT2_CLIENT_SECRET`, `CONCEPT2_TOKENS`, `CONCEPT2_DATA_DIR`) – oder von Hand setzen.
