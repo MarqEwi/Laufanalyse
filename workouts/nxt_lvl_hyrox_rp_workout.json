@@ -1,7 +1,7 @@
 {
   "name": "NXT LVL Hyrox RP Workout",
-  "sport": "other",
-  "description": "Coach Engelhardt 20.09.2026: SSP RPE 9-10. 20 min locker laufen Z1-Z2, 5 Runden: 3:00 Run RP, 1:00 Station kontrolliert hart, 2:30 Recovery Joggen/Gehen. Stationen: Sled Push, Sled Pull, Burpees, Lunges, Wall Balls. CD 20 min Bike.",
+  "sport": "cardio",
+  "description": "Coach Engelhardt 21.09.2026: SSP RPE 9-10. 20 min locker laufen Z1-Z2, 5 Runden: 3:00 Run RP, 1:00 Station kontrolliert hart, 2:30 Recovery Joggen/Gehen. Stationen: Sled Push, Sled Pull, Burpees, Lunges, Wall Balls. CD 20 min Bike. Profil Hybrid (Cardio).",
   "steps": [
     {"type": "warmup",   "duration_s": 1200, "target": {"hr_bpm": [90, 155]}, "note": "Locker laufen Z1-Z2"},
 
