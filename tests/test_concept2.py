@@ -129,6 +129,39 @@ def test_steady_state_without_hr():
     assert "HR: keine Daten" in ce.coach_text(a)
 
 
+def test_validator_sample_variable_interval():
+    """Beispiel aus dem Concept2 'API Workout Validator': Intervalle ohne rest_time, HF average=0, VariableInterval."""
+    sample = {"id": 5, "type": "rower", "date": "2017-12-30 17:01:00", "distance": 369, "time": 900, "rest_distance": 6592,
+              "rest_time": 17100, "weight_class": "H", "verified": True, "comments": "", "stroke_rate": 23,
+              "workout_type": "VariableInterval", "heart_rate": {"ending": 138, "average": 132},
+              "workout": {"intervals": [
+                  {"time": 300, "distance": 132, "calories_total": 9, "stroke_rate": 24, "heart_rate": {"average": 0, "ending": 108}, "type": "time"},
+                  {"type": "calorie", "time": 300, "distance": 119, "calories_total": 7, "stroke_rate": 23, "heart_rate": {"average": 0, "ending": 127}},
+                  {"type": "time", "time": 300, "distance": 118, "calories_total": 7, "stroke_rate": 23, "heart_rate": {"average": 0, "ending": 135}}]}}
+    a, _ = ce.analyze(sample, [{"t": 0, "d": 0, "p": 0, "spm": 0}, {"t": 10, "d": 20, "p": 100, "spm": 25}, {"t": 20, "d": 40, "p": 130, "spm": 25}])
+    s = a["summary"]
+    assert s["time_s"] == 90.0 and s["rest_time_s"] == 1710.0 and s["hr_avg"] == 132
+    segs = a["segments"]
+    assert len(segs) == 3 and all(g["hr_avg"] is None for g in segs)  # average=0 → keine HF
+    assert [g["hr_end"] for g in segs] == [108, 127, 135]
+    assert all(g["rest_source"].startswith("unbekannt") for g in segs)
+    assert any("Pause je Intervall nicht geliefert" in n for n in a["notes"])
+    assert a["intervals_stats"]["count"] == 3 and a["intervals_stats"]["avg_hr"] is None
+    ce.render_markdown(a)  # darf ohne HF nicht abstürzen
+
+
+def test_fixed_interval_rest_distributed():
+    res = {"id": 6, "type": "skierg", "date": "2026-09-21 08:00:00", "distance": 2000, "time": 4800, "rest_time": 2400,
+           "workout_type": "FixedDistanceInterval", "heart_rate": {},
+           "workout": {"intervals": [{"type": "distance", "time": 2400, "distance": 1000}, {"type": "distance", "time": 2400, "distance": 1000}]}}
+    a, _ = ce.analyze(res, None)
+    segs = a["segments"]
+    assert [g["rest_time_s"] for g in segs] == [120.0, 120.0]
+    assert [g["start_s"] for g in segs] == [0.0, 360.0]
+    assert a["intervals_stats"]["avg_rest_s"] == 120.0
+    assert any("gleichmäßig" in n for n in a["notes"])
+
+
 def test_compact_and_bike_pace():
     res = _load("result_steady.json")["data"]
     c = ce.compact(res)

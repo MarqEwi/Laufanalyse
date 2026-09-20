@@ -178,7 +178,26 @@ def normalize_segments(r: dict[str, Any], type_key: str | None) -> tuple[list[di
             start += time_s + rest_s
         return out
 
-    return conv(w.get("splits") or [], "split"), conv(w.get("intervals") or [], "intervall")
+    splits, intervals = conv(w.get("splits") or [], "split"), conv(w.get("intervals") or [], "intervall")
+
+    # Pausen fehlen je Intervall, stehen aber als Gesamtwert im Result (Beispiel im Concept2 API-Validator):
+    # bei festen Intervallprogrammen (FixedTimeInterval, FixedDistanceInterval, FixedCalorieInterval) ist die
+    # Pause je Intervall per Definition gleich lang → aus dem Gesamtwert verteilen; sonst nur vermerken.
+    total_rest = tenths_to_s(r.get("rest_time")) or 0.0
+    if intervals and total_rest > 0 and not any(i["rest_time_s"] for i in intervals):
+        wt = str(r.get("workout_type") or "")
+        if wt.startswith("Fixed") and len(intervals) > 0:
+            per = round(total_rest / len(intervals), 1)
+            start = 0.0
+            for i in intervals:
+                i["rest_time_s"] = per
+                i["rest_source"] = "aus Gesamtpause verteilt"
+                i["start_s"], i["end_s"] = round(start, 1), round(start + i["time_s"], 1)
+                start += i["time_s"] + per
+        else:
+            for i in intervals:
+                i["rest_source"] = "unbekannt (nur Gesamtpause im Result)"
+    return splits, intervals
 
 
 def normalize_strokes(strokes: list[dict[str, Any]], rests_s: list[float] | None = None) -> list[dict[str, Any]]:
@@ -282,6 +301,11 @@ def analyze(result: dict[str, Any], strokes_raw: list[dict[str, Any]] | None, rp
         notes.append("Keine Herzfrequenz in der Einheit (kein Gurt mit PM5/ErgData verbunden).")
     if not splits and not intervals:
         notes.append("Keine Splits/Intervalle in der Einheit (nur Gesamtwerte).")
+    src = {i.get("rest_source") for i in intervals if i.get("rest_source")}
+    if "aus Gesamtpause verteilt" in src:
+        notes.append(f"Pause je Intervall nicht einzeln geliefert; Gesamtpause {fmt_time(summary['rest_time_s'], tenths=False)} gleichmäßig auf {len(intervals)} Intervalle verteilt (festes Intervallprogramm).")
+    if any(s.startswith("unbekannt") for s in src):
+        notes.append(f"Pause je Intervall nicht geliefert (Gesamtpause {fmt_time(summary['rest_time_s'], tenths=False)}); Startzeiten der Intervalle ohne Pausen.")
 
     iv: dict[str, Any] = {"count": len(work)}
     if work:
