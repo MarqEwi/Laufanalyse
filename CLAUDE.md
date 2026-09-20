@@ -19,6 +19,13 @@
   Tools `mcp__garmin__concept2_*` desselben Servers; Workouts anlegen über `/workout`.
 - Tool-Referenz: `docs/garmin-tools.md` (Garmin), `docs/concept2-tools.md` (Concept2).
 - Tests ohne Netz: `uv run --with pytest --with requests pytest -q tests/`.
+- Ordner und Dateien, die für den Nutzer angelegt werden (Archiv-Tage, Exporte, Projektordner), heißen
+  `YYYY-MM-DD Titel`, z. B. `2026-09-20 Hyrox Training` (Wunsch des Nutzers vom 20.09.2026). Bestehende
+  technische Namen wie `data/garmin/<datum>_<id>` bleiben, alles Neue folgt der Vorlage.
+- Trainingsarchiv: Fotos, Exporte, Auswertung und Coach-Text eines Tages gehören ins private Repo
+  `MarqEwi/training-archiv` (Skill `/archiv`, `scripts/archiv.py`, Doku `docs/nas-archiv.md`), nie in dieses
+  Code-Repo. Die NAS spiegelt das Archiv nach `/volume1/Grundlagen/training/archiv` (`nas/training-sync`).
+  Lokaler Klon am PC: `E:\Users\Marc\Claude Projekte\training-archiv` (`TRAINING_ARCHIV_DIR`).
 
 ## NAS-Umgebung (Projekt „training“ auf STEVENAS) – Kontext vom Nutzer, 20.09.2026
 

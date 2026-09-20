@@ -236,7 +236,8 @@ def test_dev_mode_separates_tokens_and_credentials(token_env: Path, monkeypatch:
     monkeypatch.setenv("CONCEPT2_CLIENT_SECRET", "live-sec")
     assert c2.client_credentials() == ("live-id", "live-sec")
     monkeypatch.setenv("CONCEPT2_DEV", "1")
-    monkeypatch.delenv("CONCEPT2_DEV_TOKENS", raising=False)
+    for k in ("CONCEPT2_DEV_TOKENS", "CONCEPT2_DEV_CLIENT_ID", "CONCEPT2_DEV_CLIENT_SECRET", "CONCEPT2_DEV_TOKENS_B64"):
+        monkeypatch.delenv(k, raising=False)  # echte Dev-Zugangsdaten der Umgebung ausblenden
     assert c2.is_dev() and c2.token_dir() != token_env and c2.token_dir().name.endswith("-dev")
     monkeypatch.setenv("CONCEPT2_DEV_TOKENS", str(token_env / "devtok"))  # leerer Ordner, keine echten Dev-Tokens
     assert c2.token_dir() == token_env / "devtok"

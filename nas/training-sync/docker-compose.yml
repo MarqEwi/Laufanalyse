@@ -1,0 +1,35 @@
+# Trainingsarchiv-Sync auf STEVENAS: holt das private Repo training-archiv regelmäßig nach
+# /volume1/Grundlagen/training/archiv. Nur ausgehende Verbindung (GitHub), kein offener Port,
+# Bridge-Netz reicht (kein LAN-Zugriff nötig, Hairpin-NAT spielt keine Rolle).
+#
+# Ablage auf der NAS:  /volume1/Grundlagen/training/sync/  (docker-compose.yml, sync.sh, .env)
+#                      /volume1/Grundlagen/training/keys/training-archiv_deploy  (Deploy-Key, nur lesend)
+#                      /volume1/Grundlagen/training/archiv/                       (Ziel, Klon des Repos)
+# Start:  cd /volume1/Grundlagen/training/sync && docker compose up -d
+# Logs:   docker logs -f training-sync
+#
+# Image alpine/git ist multi-arch (arm64), ~30 MB; Container braucht < 20 MB RAM.
+services:
+  training-sync:
+    image: alpine/git:2.47.2
+    container_name: training-sync
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/sync.sh"]
+    environment:
+      ARCHIV_REPO: ${ARCHIV_REPO:-git@github.com:MarqEwi/training-archiv.git}
+      ARCHIV_BRANCH: ${ARCHIV_BRANCH:-main}
+      INTERVAL: ${INTERVAL:-600}
+      TZ: Europe/Berlin
+    # UID/GID des NAS-Nutzers MarcEwers, damit die Dateien per SMB bearbeitbar sind:
+    # in der PC-Session per `ssh MarcEwers@STEVENAS id` ermitteln und in .env eintragen.
+    user: "${PUID:-1000}:${PGID:-1000}"
+    volumes:
+      - /volume1/Grundlagen/training/archiv:/archiv
+      - /volume1/Grundlagen/training/sync/sync.sh:/sync.sh:ro
+      - /volume1/Grundlagen/training/keys:/keys:ro
+    mem_limit: 64m
+    logging:
+      driver: json-file
+      options:
+        max-size: "1m"
+        max-file: "3"
