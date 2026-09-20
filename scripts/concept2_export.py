@@ -450,6 +450,110 @@ def coach_text(a: dict[str, Any]) -> str:
 
 
 # ----------------------------------------------------------------------------
+# Manuelle Einheit (PM5-Foto) → Concept2-Datenformat
+# ----------------------------------------------------------------------------
+
+
+def parse_time(v: Any) -> float:
+    """'4:17.1', 'r4:50', '21:37.5', '1:02:05.0' oder Zahl (Sekunden) → Sekunden."""
+    if v is None:
+        return 0.0
+    if isinstance(v, (int, float)):
+        return float(v)
+    s = str(v).strip().lstrip("rR").strip()
+    parts = s.split(":")
+    try:
+        nums = [float(p.replace(",", ".")) for p in parts]
+    except ValueError as exc:
+        raise ValueError(f"Zeit nicht lesbar: {v!r} (erwartet m:ss.z oder h:mm:ss)") from exc
+    sec = 0.0
+    for n in nums:
+        sec = sec * 60 + n
+    return sec
+
+
+def _tenths(sec: float) -> int:
+    return int(round(sec * 10))
+
+
+def manual_to_result(spec: dict[str, Any]) -> dict[str, Any]:
+    """Abgelesene PM5-Werte in das Result-Format der Logbook-API übersetzen (Zeiten in Zehntelsekunden).
+
+    spec = {"type": "skierg|rower|bike", "date": "2026-09-20 16:09" (Endzeit wie im Logbook, Minute reicht),
+            "workout_type": "VariableInterval|FixedDistanceInterval|FixedTimeInterval|FixedDistanceSplits|JustRow"?,
+            "intervals": [{"time": "4:17.1", "distance": 1000, "spm": 43, "rest": "4:50", "rest_distance": 13, "hr_avg": 150?, "hr_max"?}],
+            "splits":    [{"time": "4:32.2", "distance": 2000, "spm": 66}],      # alternativ zu intervals
+            "drag_factor": 110?, "comments": "…"?, "id": "foto-20260920-1609"?}
+    Gesamtwerte (Distanz, Zeit, Pause, Ø-SPM) werden aus den Abschnitten berechnet.
+    """
+    t = str(spec.get("type") or "").strip().lower()
+    if t not in TYPE_DE:
+        raise ValueError(f"type muss eines von {', '.join(sorted(TYPE_DE))} sein, nicht {t!r}")
+    date = str(spec.get("date") or "").strip()
+    if len(date) == 10:
+        date += " 00:00:00"
+    elif len(date) == 16:
+        date += ":00"
+    if len(date) != 19:
+        raise ValueError("date im Format YYYY-MM-DD HH:MM (Endzeit der Einheit) angeben")
+
+    def seg(it: dict[str, Any], kind: str) -> dict[str, Any]:
+        d: dict[str, Any] = {
+            "type": it.get("kind") or ("distance" if it.get("distance") else "time"),
+            "time": _tenths(parse_time(it.get("time"))),
+            "distance": int(round(float(it.get("distance") or 0))),
+            "calories_total": it.get("calories"),
+            "stroke_rate": it.get("spm"),
+        }
+        hr = {k: it[src] for k, src in (("average", "hr_avg"), ("max", "hr_max"), ("ending", "hr_end")) if it.get(src)}
+        d["heart_rate"] = hr
+        if kind == "intervall":
+            d["rest_time"] = _tenths(parse_time(it.get("rest")))
+            d["rest_distance"] = int(round(float(it.get("rest_distance") or 0)))
+        return d
+
+    intervals = [seg(i, "intervall") for i in (spec.get("intervals") or [])]
+    splits = [seg(s, "split") for s in (spec.get("splits") or [])]
+    segs = intervals or splits
+    if not segs:
+        raise ValueError("intervals oder splits angeben")
+    time_t = sum(s["time"] for s in segs)
+    dist = sum(s["distance"] for s in segs)
+    rest_t = sum(s.get("rest_time") or 0 for s in intervals)
+    spm_w = [(s["stroke_rate"], s["time"]) for s in segs if s.get("stroke_rate")]
+    spm = round(sum(a * b for a, b in spm_w) / sum(b for _, b in spm_w)) if spm_w else spec.get("spm")
+    hr_avgs = [(s["heart_rate"]["average"], s["time"]) for s in segs if s["heart_rate"].get("average")]
+    hr: dict[str, Any] = {}
+    if hr_avgs:
+        hr["average"] = round(sum(a * b for a, b in hr_avgs) / sum(b for _, b in hr_avgs))
+        mx = [s["heart_rate"]["max"] for s in segs if s["heart_rate"].get("max")]
+        if mx:
+            hr["max"] = max(mx)
+    wt = spec.get("workout_type") or ("VariableInterval" if intervals else "FixedDistanceSplits")
+    rid = spec.get("id") or f"foto-{date[:16].replace('-', '').replace(' ', '-').replace(':', '')}"
+    return {
+        "id": rid, "date": date, "timezone": spec.get("timezone", "Europe/Berlin"), "type": t, "distance": dist, "time": time_t,
+        "time_formatted": fmt_time(time_t / 10), "workout_type": wt, "source": spec.get("source", "PM5-Foto (manuell)"),
+        "verified": False, "stroke_rate": spm, "drag_factor": spec.get("drag_factor"), "rest_time": rest_t,
+        "rest_distance": sum(s.get("rest_distance") or 0 for s in intervals), "stroke_data": False,
+        "heart_rate": hr, "comments": spec.get("comments"), "workout": {"splits": splits, "intervals": intervals},
+    }
+
+
+def analyze_manual(spec: dict[str, Any], *, rpe: float | None, out_dir: str | None) -> tuple[Path, dict[str, Any]]:
+    """Wie export_and_analyze, aber aus abgelesenen Werten statt aus der API. Sichert unter <out>/<datum>_<id>/."""
+    result = manual_to_result(spec)
+    analysis, strokes = analyze(result, None, rpe=rpe)
+    analysis["notes"] = [n for n in analysis["notes"] if "Schlagdaten" not in n]
+    analysis["notes"].insert(0, "Quelle: PM5-Foto, manuell abgelesen (nicht im Concept2-Logbook). Werte wie am Monitor angezeigt, Gesamtwerte berechnet.")
+    analysis["manual_spec"] = spec
+    out = base_dir(out_dir) / f"{analysis['summary']['date']}_{result['id']}"
+    write_outputs(out, analysis, strokes, {"result": result, "manual_spec": spec})
+    analysis["output_dir"] = str(out.resolve())
+    return out, analysis
+
+
+# ----------------------------------------------------------------------------
 # Speichern / Laden
 # ----------------------------------------------------------------------------
 
@@ -576,6 +680,7 @@ def main() -> int:
     ap.add_argument("--date", help="Einheit an diesem Datum (YYYY-MM-DD)")
     ap.add_argument("--type", dest="type_", choices=sorted(TYPE_DE), help="Gerät, z. B. rower, skierg, bike")
     ap.add_argument("--rpe", type=float, help="RPE des Nutzers für Bericht und Coach-Text")
+    ap.add_argument("--manual", metavar="SPEC.json", help="abgelesene PM5-Werte (JSON, siehe manual_to_result) statt API auswerten")
     ap.add_argument("--list", type=int, metavar="N", help="letzte N Einheiten anzeigen")
     ap.add_argument("--exported", action="store_true", help="bereits gesicherte Einheiten auflisten")
     ap.add_argument("--out", help="Ausgabe-Ordner (Standard $CONCEPT2_DATA_DIR oder ./data/concept2)")
@@ -585,6 +690,18 @@ def main() -> int:
     if a.exported:
         for r in list_exported(base_dir(a.out)):
             print(f"{r['date']}  {r['type']:<7} {fmt_num(r['distance_m'], 0):>6} m  {r['time_str']:>8}  {r['pace_str']:>7}  HF {r['avg_hr'] or '–'}  ID {r['result_id']}")
+        return 0
+    if a.manual:
+        try:
+            spec = json.loads(Path(a.manual).read_text(encoding="utf-8"))
+            out, analysis = analyze_manual(spec, rpe=a.rpe, out_dir=a.out)
+        except (ValueError, OSError) as exc:
+            print(f"Fehler: {exc}", file=sys.stderr)
+            return 1
+        print(f"Gesichert unter {out}")
+        if a.print:
+            print(render_markdown(analysis))
+            print(coach_text(analysis))
         return 0
     try:
         client = c2.connect()

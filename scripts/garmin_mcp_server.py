@@ -544,6 +544,25 @@ def concept2_analyze_result(
 
 
 @mcp_server.tool()
+def concept2_analyze_manual(spec: dict[str, Any], rpe: float | None = None, out_dir: str | None = None) -> dict[str, Any]:
+    """Abfotografierte PM5-Einheit (nicht im Logbook) auswerten wie concept2_analyze_result: gleiche Kennzahlen,
+    Bericht und Coach-Text, Sicherung unter <out_dir>/<datum>_foto-…/.
+
+    spec = {"type": "skierg|rower|bike", "date": "YYYY-MM-DD HH:MM" (Endzeit),
+            "workout_type": "VariableInterval|FixedDistanceInterval|FixedTimeInterval|FixedDistanceSplits|JustRow"?,
+            "intervals": [{"time": "4:17.1", "distance": 1000, "spm": 43, "rest": "4:50", "rest_distance": 13, "hr_avg"?, "hr_max"?}, …]
+            oder "splits": [{"time": "4:32.2", "distance": 2000, "spm": 66}, …],
+            "drag_factor"?, "comments"?}
+    Zeiten wie am Monitor (m:ss.z). Gesamtdistanz, Gesamtzeit, Pausen und Ø-SPM werden berechnet. Vorher die
+    abgelesenen Werte dem Nutzer zur Kontrolle zeigen."""
+    try:
+        out, analysis = ce.analyze_manual(spec, rpe=rpe, out_dir=out_dir)
+    except ValueError as exc:
+        raise RuntimeError(f"Manuelle Einheit: {exc}") from exc
+    return {"output_dir": str(out.resolve()), "summary_md": ce.render_markdown(analysis), "coach_text": ce.coach_text(analysis), "analysis": analysis}
+
+
+@mcp_server.tool()
 def concept2_list_exported(out_dir: str | None = None) -> list[dict[str, Any]]:
     """Bereits gesicherte Ergometer-Einheiten (Ordner, Datum, ID, Gerät, Distanz, Zeit, Pace, Ø-HF, Intervalle) – für Vergleiche ohne API."""
     return ce.list_exported(ce.base_dir(out_dir))

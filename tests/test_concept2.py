@@ -162,6 +162,61 @@ def test_fixed_interval_rest_distributed():
     assert any("gleichmäßig" in n for n in a["notes"])
 
 
+def test_parse_time():
+    assert ce.parse_time("4:17.1") == 257.1
+    assert ce.parse_time("r4:50") == 290.0
+    assert ce.parse_time("1:02:05.0") == 3725.0
+    assert ce.parse_time(90) == 90.0 and ce.parse_time(None) == 0.0
+    with pytest.raises(ValueError):
+        ce.parse_time("abc")
+
+
+def test_manual_skierg_from_photo(tmp_path: Path):
+    """Ski-Erg-Foto vom 20.09.2026: 5×1000 m, PM5 zeigt 21:37.5 / 2:09.7 / 39 spm, Laufzeit 50:20.5."""
+    spec = {"type": "skierg", "date": "2026-09-20 16:09", "drag_factor": 110, "comments": "PM5-Foto",
+            "intervals": [
+                {"time": "4:17.1", "distance": 1000, "spm": 43, "rest": "4:50", "rest_distance": 13},
+                {"time": "4:12.7", "distance": 1000, "spm": 39, "rest": "5:03", "rest_distance": 17},
+                {"time": "4:19.1", "distance": 1000, "spm": 38, "rest": "4:23", "rest_distance": 8},
+                {"time": "4:21.7", "distance": 1000, "spm": 38, "rest": "4:27", "rest_distance": 15},
+                {"time": "4:26.9", "distance": 1000, "spm": 38, "rest": "10:00", "rest_distance": 13}]}
+    r = ce.manual_to_result(spec)
+    assert r["distance"] == 5000 and r["time"] == 12975 and r["time_formatted"] == "21:37.5"
+    assert r["time"] + r["rest_time"] == _tenths_total(50 * 60 + 20.5)
+    assert r["workout_type"] == "VariableInterval" and r["stroke_rate"] == 39 and r["id"] == "foto-20260920-1609"
+    out, a = ce.analyze_manual(spec, rpe=5, out_dir=str(tmp_path))
+    s, iv = a["summary"], a["intervals_stats"]
+    assert s["pace_str"] == "2:09.8" and iv["count"] == 5 and iv["avg_pace_str"] == "2:09.8"
+    assert iv["pace_trend_s_per_interval"] > 0 and "langsamer" in iv["trend_text"]
+    assert a["notes"][0].startswith("Quelle: PM5-Foto")
+    assert (out / "summary.md").is_file() and (out / "raw" / "manual_spec.json").is_file()
+    assert out.name == "2026-09-20_foto-20260920-1609"
+    txt = ce.coach_text(a)
+    assert "Ski Erg 2026-09-20: 5000 m in 21:37.5" in txt and "RPE: 5" in txt
+    assert ce.list_exported(tmp_path)[0]["result_id"] == "foto-20260920-1609"
+
+
+def _tenths_total(sec: float) -> int:
+    return int(round(sec * 10))
+
+
+def test_manual_bike_splits_and_errors():
+    spec = {"type": "bike", "date": "2026-09-20 15:28", "splits": [
+        {"time": "4:32.2", "distance": 2000, "spm": 66}, {"time": "4:07.6", "distance": 2000, "spm": 72},
+        {"time": "4:08.8", "distance": 2000, "spm": 72}, {"time": "4:09.2", "distance": 2000, "spm": 72},
+        {"time": "4:12.3", "distance": 2000, "spm": 71}]}
+    r = ce.manual_to_result(spec)
+    assert r["distance"] == 10000 and r["time_formatted"] == "21:10.1" and r["workout_type"] == "FixedDistanceSplits"
+    a, _ = ce.analyze(r, None)
+    assert a["summary"]["pace_unit_m"] == 1000 and a["splits"][0]["pace_str"] == "2:16.1" and not a["is_interval_session"]
+    with pytest.raises(ValueError, match="type"):
+        ce.manual_to_result({"type": "treadmill", "date": "2026-09-20 10:00", "splits": [{"time": "1:00", "distance": 100}]})
+    with pytest.raises(ValueError, match="date"):
+        ce.manual_to_result({"type": "rower", "date": "gestern", "splits": [{"time": "1:00", "distance": 100}]})
+    with pytest.raises(ValueError, match="intervals oder splits"):
+        ce.manual_to_result({"type": "rower", "date": "2026-09-20 10:00"})
+
+
 def test_compact_and_bike_pace():
     res = _load("result_steady.json")["data"]
     c = ce.compact(res)

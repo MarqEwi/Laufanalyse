@@ -42,6 +42,20 @@ Das Tool `concept2_analyze_result` lädt Zusammenfassung, Splits/Intervalle und 
       in den Kommentar der Coaching-App.
    `analysis.notes` am Ende nennen.
 
+## Einheit vom PM5-Foto (nicht im Logbook)
+
+Schickt der Nutzer Fotos der PM5-„Detail Anzeige“ (Gerät ohne ErgData-Verbindung), die Werte ablesen und mit
+`concept2_analyze_manual(spec, rpe=…)` auswerten. Ablauf:
+
+1. Vom Foto ablesen: Gerät (SkiERG-Aufkleber, „/1000m rpm“ = Bike Erg, sonst RowErg), Datum, Gesamtzeile
+   (Zeit, Meter, Pace, SPM), je Abschnitt Zeit, Meter, Pace, SPM, bei Intervallen die Pausenzeile `r4:50` mit Metern.
+   Das PM5-Datum kann falsch sein (Uhr des Monitors); Datum und Endzeit im Zweifel vom Nutzer oder aus Garmin.
+2. Die abgelesenen Werte als Tabelle zeigen und bestätigen lassen (Ablesefehler sind die häufigste Fehlerquelle).
+3. `spec` bauen: `type`, `date` = Endzeit `YYYY-MM-DD HH:MM`, `intervals` (mit `rest`) oder `splits`, `spm`, optional
+   `hr_avg`/`hr_max` je Abschnitt aus Garmin (Zeitfenster wie in `docs/concept2-tools.md` Abschnitt 5 beschrieben).
+4. Prüfen, dass die berechnete Gesamtzeit und Distanz mit der Gesamtzeile des PM5 übereinstimmen; Abweichung
+   nennen. Die Einheit landet unter `data/concept2/<datum>_foto-…/`, Quelle „PM5-Foto“, nicht im Logbook.
+
 ## Nachfragen und Vergleiche
 
 - „Intervall 3?“ → `analysis.segments[2]`: Pace, Watt, SPM, Ø-/Max-HF, HF-Anstieg (`hr_start_strokes` → `hr_end_strokes`).

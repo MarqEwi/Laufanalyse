@@ -79,10 +79,18 @@ wiederholen (Session-Weg oben oder `concept2_login.py --force` am PC), dann `CON
 | `concept2_list_results` | `limit`=10, `type`? (`rower`, `skierg`, `bike` …), `from_date`?, `to_date`? | neueste zuerst: `result_id`, `date`, `start_local`, `type`, `type_de`, `workout_type`, `distance_m`, `time_str`, `pace_str`, `spm`, `hr_avg`, `hr_max`, `has_stroke_data`, `source`, `comments` |
 | `concept2_get_result` | `result_id` | `summary` (normalisiert), `splits[]`, `intervals[]` (je: `nr`, `start_s`, `time_s`, `distance_m`, `pace_s`/`pace_str`, `watts`, `spm`, `hr_avg`, `hr_max`, `hr_end`, `rest_time_s`), `raw` |
 | `concept2_analyze_result` | `result_id`?, `date`?, `type`?, `rpe`?, `out_dir`? (nichts = letzte Einheit) | `output_dir`, `summary_md` (Bericht), `coach_text` (Pace/HF/RPE als Textbaustein), `analysis` (`summary`, `segments` mit `hr_start_strokes`/`hr_end_strokes`/`hr_rise`, `intervals_stats`: Anzahl, Ø-Pace, Streuung, Spanne, Trend, Ø-HF, HF-Anstieg, `notes`) |
+| `concept2_analyze_manual` | `spec` (abgelesene PM5-Werte: `type`, `date` = Endzeit, `intervals`/`splits` mit `time` „m:ss.z“, `distance`, `spm`, `rest`, optional `hr_avg`/`hr_max`), `rpe`?, `out_dir`? | wie `concept2_analyze_result`, aber aus Fotowerten; Gesamtwerte berechnet, Quelle „PM5-Foto“, Ordner `<datum>_foto-<datum-zeit>/` mit `raw/manual_spec.json` |
 | `concept2_list_exported` | `out_dir`? | gesicherte Einheiten mit Kennzahlen (Vergleiche ohne API) |
 
 CLI am PC (gleiche Logik): `uv run scripts/concept2_export.py [--id … | --date … | --type skierg] [--rpe 7] [--print]`,
-`--list 10`, `--exported`.
+`--list 10`, `--exported`, `--manual spec.json` (PM5-Foto).
+
+**Schreibzugriff (Ergebnisse ins Logbook hochladen):** Die API hat `POST /users/me/results` im Format des
+„API Workout Validator“ (Scope `results:write`). Für das echte Logbook werden neuen Apps nur `user:read`
+und `results:read` gewährt; Schreibrechte müssen laut Schlüsselseite über das Test-Logbook
+`log-dev.concept2.com` entwickelt und von Concept2 freigeschaltet werden (Stand 20.09.2026, nicht beantragt).
+Bis dahin: Einheiten vom Foto mit `concept2_analyze_manual` nur lokal auswerten oder im Logbook unter
+„Add Workout“ von Hand eintragen.
 
 ## 4. Datenstruktur (`data/concept2/<datum>_<result_id>/`)
 
