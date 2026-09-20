@@ -1,0 +1,15 @@
+{
+  "name": "Run Short Option 2",
+  "sport": "running",
+  "description": "Coach Engelhardt 22.09.2026: Run Short Option 2, RPE 7. WA 10 min mit 2 min Aktivierung, 1 min gehen, 6x (800 m RPE 8/10 Z3-4, 400 m running-rec RPE 6/10 keine Entlastung), 10 min Z1 auslaufen.",
+  "steps": [
+    {"type": "warmup",   "duration_s": 480, "note": "8 min locker einlaufen"},
+    {"type": "interval", "duration_s": 120, "note": "2 min Aktivierung zuegig"},
+    {"type": "recovery", "duration_s": 60,  "note": "1 min gehen"},
+    {"repeat": 6, "steps": [
+      {"type": "interval", "distance_m": 800, "target": {"pace_min_km": ["4:10", "4:25"]}, "note": "800 m RPE 8 Z3-4"},
+      {"type": "recovery", "distance_m": 400, "note": "400 m traben RPE 6"}
+    ]},
+    {"type": "cooldown", "duration_s": 600, "note": "10 min Z1 auslaufen"}
+  ]
+}
