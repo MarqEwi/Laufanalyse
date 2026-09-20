@@ -59,6 +59,20 @@ SPORTS = {
     "strength": (5, "strength_training", 4),
 }
 STEP_TYPES = {"warmup": 1, "cooldown": 2, "interval": 3, "recovery": 4, "rest": 5, "repeat": 6}
+
+# Übungen aus dem Garmin-Katalog (category, exerciseName). Werte abgelesen am 20.09.2026 an einem Cardio-Workout,
+# das der Nutzer in der Connect-App manuell mit Übungen versehen hat (Workout 1703599385). Andere Kürzel:
+# {"category": "...", "name": "..."} direkt angeben (Garmin-Katalognamen in Großbuchstaben, z. B. aus get_workout raw).
+EXERCISES = {
+    "run": ("RUN", "JOG"),                       # Laufen (Belastung)
+    "run_walk": ("RUN", "RUN_OR_WALK"),          # Laufen/Gehen (Aufwärmen, Erholung)
+    "sled_push": ("SLED", "PUSH"),
+    "sled_pull": ("SLED", "BACKWARD_DRAG"),
+    "burpee": ("TOTAL_BODY", "BURPEE"),
+    "lunge": ("LUNGE", "WEIGHTED_WALKING_LUNGE"),
+    "wall_ball": ("SQUAT", "WALL_BALL"),
+    "indoor_bike": ("INDOOR_BIKE", ""),
+}
 STEP_LABEL = {
     "warmup": "Aufwärmen", "cooldown": "Auslaufen", "interval": "Belastung",
     "recovery": "Erholung", "rest": "Pause", "repeat": "Wiederholen",
@@ -148,8 +162,23 @@ def build_steps(steps: list[dict[str, Any]], counter: list[int]) -> list[dict[st
         d.update(_target(st.get("target")))
         if st.get("note"):
             d["description"] = st["note"]
+        ex = st.get("exercise")
+        if ex:
+            if isinstance(ex, str):
+                if ex not in EXERCISES:
+                    raise ValueError(f"Unbekannte Übung '{ex}'. Bekannt: {', '.join(sorted(EXERCISES))} oder {{'category','name'}}.")
+                cat, name = EXERCISES[ex]
+            else:
+                cat, name = str(ex["category"]).upper(), str(ex.get("name", "")).upper()
+            d["category"], d["exerciseName"] = cat, name
+            d["weightValue"] = float(st["weight_kg"]) if st.get("weight_kg") is not None else 0.0
+            d["weightUnit"] = {"unitId": 8, "unitKey": "kilogram", "factor": 1000.0}
         out.append(d)
     return out
+
+
+def _has_exercise(steps: list[dict[str, Any]]) -> bool:
+    return any(("exercise" in s) or ("repeat" in s and _has_exercise(s["steps"])) for s in steps)
 
 
 def estimated_seconds(steps: list[dict[str, Any]]) -> int:
@@ -165,13 +194,16 @@ def estimated_seconds(steps: list[dict[str, Any]]) -> int:
 def build_workout(spec: dict[str, Any]) -> dict[str, Any]:
     sid, skey, disp = SPORTS[spec.get("sport", "running")]
     sport = {"sportTypeId": sid, "sportTypeKey": skey, "displayOrder": disp}
-    return {
+    w = {
         "workoutName": spec["name"],
         "description": spec.get("description"),
         "sportType": sport,
         "estimatedDurationInSecs": estimated_seconds(spec["steps"]),
         "workoutSegments": [{"segmentOrder": 1, "sportType": sport, "workoutSteps": build_steps(spec["steps"], [0])}],
     }
+    if skey in ("cardio_training", "strength_training") and _has_exercise(spec["steps"]):
+        w["subSportType"] = "GENERIC"  # so speichert es die Connect-App bei Workouts mit Übungen
+    return w
 
 
 def describe(w: dict[str, Any]) -> str:
@@ -208,7 +240,10 @@ def describe(w: dict[str, Any]) -> str:
             else:
                 target = f"{tkey} {v1}–{v2}"
             note = f"  ({s['description']})" if s.get("description") else ""
-            lines.append(" " * indent + f"{STEP_LABEL.get(key, key):<10} {end:<12} {target}{note}")
+            ex = ""
+            if s.get("category"):
+                ex = f"  [{s['category']}" + (f"/{s['exerciseName']}" if s.get("exerciseName") else "") + "]"
+            lines.append(" " * indent + f"{STEP_LABEL.get(key, key):<10} {end:<12} {target}{note}{ex}")
 
     for seg in w.get("workoutSegments") or []:
         walk(seg.get("workoutSteps") or [])

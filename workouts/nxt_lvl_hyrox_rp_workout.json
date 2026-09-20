@@ -3,28 +3,26 @@
   "sport": "cardio",
   "description": "Coach Engelhardt 21.09.2026: SSP RPE 9-10. Warm-up 20 min locker laufen Z1-Z2. Main 5 Runden: 3:00 Run RP, 1:00 Station kontrolliert hart, 2:30 Recovery locker joggen/gehen. Stationen R1 Sled Push, R2 Sled Pull, R3 Burpees, R4 Lunges, R5 Wall Balls. CD 20 min Bike. Alle Schritte nach Zeit, Profil Hybrid (Cardio).",
   "steps": [
-    {"type": "warmup",   "duration_s": 1200, "target": {"hr_bpm": [90, 155]}, "note": "Warm-up 20 min laufen Z1-Z2"},
+    {"type": "warmup", "duration_s": 1200, "target": {"hr_bpm": [90, 155]}, "exercise": "run_walk", "note": "Warm-up 20 min laufen Z1-Z2"},
+    {"type": "interval", "duration_s": 180, "exercise": "run", "note": "R1 Laufen 3 min Race Pace"},
+    {"type": "interval", "duration_s": 60, "exercise": "sled_push", "note": "R1 Sled Push 1 min hart"},
+    {"type": "recovery", "duration_s": 150, "exercise": "run_walk", "note": "R1 2:30 locker joggen/gehen"},
 
-    {"type": "interval", "duration_s": 180, "note": "R1 Laufen 3 min Race Pace"},
-    {"type": "interval", "duration_s": 60,  "note": "R1 Sled Push 1 min hart"},
-    {"type": "recovery", "duration_s": 150, "note": "R1 2:30 locker joggen/gehen"},
+    {"type": "interval", "duration_s": 180, "exercise": "run", "note": "R2 Laufen 3 min Race Pace"},
+    {"type": "interval", "duration_s": 60, "exercise": "sled_pull", "note": "R2 Sled Pull 1 min hart"},
+    {"type": "recovery", "duration_s": 150, "exercise": "run_walk", "note": "R2 2:30 locker joggen/gehen"},
 
-    {"type": "interval", "duration_s": 180, "note": "R2 Laufen 3 min Race Pace"},
-    {"type": "interval", "duration_s": 60,  "note": "R2 Sled Pull 1 min hart"},
-    {"type": "recovery", "duration_s": 150, "note": "R2 2:30 locker joggen/gehen"},
+    {"type": "interval", "duration_s": 180, "exercise": "run", "note": "R3 Laufen 3 min Race Pace"},
+    {"type": "interval", "duration_s": 60, "exercise": "burpee", "note": "R3 Burpees 1 min hart"},
+    {"type": "recovery", "duration_s": 150, "exercise": "run_walk", "note": "R3 2:30 locker joggen/gehen"},
 
-    {"type": "interval", "duration_s": 180, "note": "R3 Laufen 3 min Race Pace"},
-    {"type": "interval", "duration_s": 60,  "note": "R3 Burpees 1 min hart"},
-    {"type": "recovery", "duration_s": 150, "note": "R3 2:30 locker joggen/gehen"},
+    {"type": "interval", "duration_s": 180, "exercise": "run", "note": "R4 Laufen 3 min Race Pace"},
+    {"type": "interval", "duration_s": 60, "exercise": "lunge", "note": "R4 Lunges 1 min hart"},
+    {"type": "recovery", "duration_s": 150, "exercise": "run_walk", "note": "R4 2:30 locker joggen/gehen"},
 
-    {"type": "interval", "duration_s": 180, "note": "R4 Laufen 3 min Race Pace"},
-    {"type": "interval", "duration_s": 60,  "note": "R4 Lunges 1 min hart"},
-    {"type": "recovery", "duration_s": 150, "note": "R4 2:30 locker joggen/gehen"},
-
-    {"type": "interval", "duration_s": 180, "note": "R5 Laufen 3 min Race Pace"},
-    {"type": "interval", "duration_s": 60,  "note": "R5 Wall Balls 1 min hart"},
-    {"type": "recovery", "duration_s": 150, "note": "R5 2:30 locker joggen/gehen"},
-
-    {"type": "cooldown", "duration_s": 1200, "note": "Cooldown 20 min Bike locker"}
+    {"type": "interval", "duration_s": 180, "exercise": "run", "note": "R5 Laufen 3 min Race Pace"},
+    {"type": "interval", "duration_s": 60, "exercise": "wall_ball", "note": "R5 Wall Balls 1 min hart"},
+    {"type": "recovery", "duration_s": 150, "exercise": "run_walk", "note": "R5 2:30 locker joggen/gehen"},
+    {"type": "cooldown", "duration_s": 1200, "exercise": "indoor_bike", "note": "Cooldown 20 min Bike locker"}
   ]
 }

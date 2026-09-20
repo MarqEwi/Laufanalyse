@@ -105,6 +105,7 @@ vorhandenen Workouts des Kontos:
 | Ziel HF-Zone | `heart.rate.zone` mit `zoneNumber` 1–5, Werte null |
 | Ziel Pace | `pace.zone` (id 6) mit `targetValueOne` = schnellere, `targetValueTwo` = langsamere Geschwindigkeit in m/s (4:32 min/km = 3,676 m/s) |
 | Wiederholung | `RepeatGroupDTO` mit `numberOfIterations`, `endCondition` iterations=7, `workoutSteps` |
+| Übung (Cardio/Kraft) | je Schritt `category` + `exerciseName` (+ `weightValue`, `weightUnit` kg), Workout `subSportType: "GENERIC"`. Abgelesen 20.09.2026 an einem in der Connect-App bearbeiteten Cardio-Workout: RUN/JOG (Laufen), RUN/RUN_OR_WALK (Laufen/Gehen), SLED/PUSH, SLED/BACKWARD_DRAG (Sled Pull), TOTAL_BODY/BURPEE, LUNGE/WEIGHTED_WALKING_LUNGE, SQUAT/WALL_BALL, INDOOR_BIKE/"" . Einen Katalog-Endpunkt hat die API nicht (`/workout-service/exercises` u. a. → 404); neue Codes über ein in der App bearbeitetes Workout und `get_workout` ablesen. Spezifikation: `"exercise": "sled_push"` oder `{"category","name"}`. |
 
 MCP-Tools dazu (Skill `/workout`):
 

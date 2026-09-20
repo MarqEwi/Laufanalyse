@@ -33,7 +33,8 @@ Datenquelle und Ziel ist der MCP-Server `garmin` (Tools `mcp__garmin__*`). Die W
   "description": "Coach-Vorgabe, Datum, RPE …",
   "steps": [
     {"type": "warmup",   "duration_s": 1200, "note": "Bike easy"},
-    {"type": "interval", "duration_s": 120,  "note": "Run RPE 7"},
+    {"type": "interval", "duration_s": 120,  "exercise": "run", "note": "Run RPE 7"},
+    {"type": "interval", "duration_s": 60,   "exercise": "sled_push", "note": "Sled Push 1 min hart"},
     {"type": "interval", "distance_m": 1000, "target": {"pace_min_km": ["4:10", "4:20"]}},
     {"type": "recovery", "duration_s": 60,   "target": {"hr_bpm": [90, 130]}},
     {"repeat": 6, "steps": [ {"type": "interval", "duration_s": 90}, {"type": "recovery", "duration_s": 40} ]},
@@ -53,6 +54,13 @@ Datenquelle und Ziel ist der MCP-Server `garmin` (Tools `mcp__garmin__*`). Die W
   `distance_m` oder `"end": "lap"` (Rundentaste).
 - Ziele: `hr_bpm [low, high]`, `hr_zone 1–5`, `pace_min_km ["schnell", "langsam"]` (nur Laufen/Gehen),
   sonst kein Ziel. Garmin verlangt bei HF immer Unter- und Obergrenze („HF unter 130“ → `[90, 130]`, das sagen).
+- `exercise` (bei `cardio`/`strength`): Übung aus dem Garmin-Katalog, die die Connect-App am Schritt anzeigt.
+  Kürzel: `run` (Laufen), `run_walk` (Laufen/Gehen für Aufwärmen und Erholung), `sled_push`, `sled_pull`,
+  `burpee`, `lunge`, `wall_ball`, `indoor_bike`; sonst `{"category": "…", "name": "…"}` mit Garmin-Codes.
+  Die Codes stammen aus einem Workout, das der Nutzer in der Connect-App manuell mit Übungen versehen hat
+  (20.09.2026; Liste in `scripts/garmin_workout.py` `EXERCISES`). Neue Übung gewünscht: Nutzer bitten, sie einmal
+  in der App an einem Schritt zu setzen, dann mit `get_workout` die Codes ablesen und in `EXERCISES` ergänzen.
+  Hyrox-Stationen immer mit `exercise` anlegen, zusätzlich zur `note`.
 - `note` erscheint auf der Uhr beim Schrittwechsel und sagt immer, **was zu tun ist**, mit Dauer oder Distanz
   (max. ~30 Zeichen): z. B. `Laufen 3 min Race Pace`, `Sled Push 1 min hart`, `2:30 locker joggen/gehen`,
   `20 min Bike locker`. Endet ein Schritt per Rundentaste, heißt es `… bis Lap-Taste`
