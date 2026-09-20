@@ -446,6 +446,61 @@ def concept2_login_status() -> dict[str, Any]:
     return info
 
 
+_c2_state: str | None = None
+
+
+@mcp_server.tool()
+def concept2_authorize_url() -> dict[str, Any]:
+    """Schritt 1 der Concept2-Autorisierung aus einer Session (auch vom Handy): liefert die URL, die der Nutzer im
+    Browser öffnet und mit „Allow“ bestätigt. Braucht CONCEPT2_CLIENT_ID und CONCEPT2_CLIENT_SECRET in der Umgebung.
+    Nach dem Bestätigen leitet Concept2 auf die Redirect-URI (Standard http://localhost:8765/callback) um – die Seite
+    lädt auf dem Handy nicht, aber die Adresszeile enthält code= und state=. Diese Adresse in den Chat einfügen und
+    concept2_exchange_code damit aufrufen."""
+    global _c2_state
+    _c2_state = c2.new_state()
+    try:
+        url = c2.authorize_url(_c2_state)
+    except c2.Concept2AuthError as exc:
+        raise RuntimeError(str(exc)) from exc
+    return {
+        "url": url,
+        "state": _c2_state,
+        "redirect_uri": c2.redirect_uri(),
+        "hinweis": "URL öffnen, bei Concept2 anmelden, Allow. Danach die Adresse der Zielseite (…?code=…&state=…) hier einfügen.",
+    }
+
+
+@mcp_server.tool()
+def concept2_exchange_code(code_or_redirect_url: str) -> dict[str, Any]:
+    """Schritt 2 der Concept2-Autorisierung: Redirect-URL (oder nur den Code) gegen Tokens tauschen und im
+    Token-Ordner speichern. Danach concept2_token_blob aufrufen, damit CONCEPT2_TOKENS_B64 in der Cloud-Umgebung
+    gesetzt werden kann. Prüft den state aus concept2_authorize_url, falls in der URL enthalten."""
+    global _c2_client
+    try:
+        code = c2.parse_code(code_or_redirect_url, _c2_state)
+        tokens = c2.exchange_code(code)
+    except (c2.Concept2AuthError, c2.Concept2ApiError) as exc:
+        raise RuntimeError(f"Concept2-Autorisierung fehlgeschlagen: {exc}") from exc
+    _c2_client = None  # nächster Aufruf nutzt die neuen Tokens
+    out: dict[str, Any] = {"token_file": str(c2.token_file()), "scope": tokens.get("scope"), "expires_at": tokens.get("expires_at")}
+    try:
+        out["logged_in_as"] = c2.whoami(_c2_or_raise())
+        out["ok"] = True
+    except Exception as exc:  # noqa: BLE001
+        out["ok"] = False
+        out["error"] = str(exc)
+    return out
+
+
+@mcp_server.tool()
+def concept2_token_blob() -> dict[str, Any]:
+    """Token-Datei als base64 für die Umgebungsvariable CONCEPT2_TOKENS_B64 (Cloud-Umgebung von Claude Code).
+    Enthält Access-/Refresh-Token und Client-ID/-Secret – nur in die Umgebungsvariablen eintragen, nie ins Repo."""
+    if not c2.tokens_present() and not c2.materialize_tokens_from_env():
+        raise RuntimeError("Keine Concept2-Token-Datei vorhanden – erst concept2_authorize_url / concept2_exchange_code ausführen.")
+    return {"env_var": "CONCEPT2_TOKENS_B64", "value": c2.token_blob_b64()}
+
+
 @mcp_server.tool()
 def concept2_list_results(limit: int = 10, type: str | None = None, from_date: str | None = None, to_date: str | None = None) -> list[dict[str, Any]]:
     """Letzte Einheiten aus dem Concept2 Logbook (neueste zuerst), kompakt: result_id, date, type (rower|skierg|bike …),

@@ -25,8 +25,10 @@ Das Tool `concept2_analyze_result` lädt Zusammenfassung, Splits/Intervalle und 
    Zahl → Result-ID. Erst `concept2_list_exported` prüfen: schon gesichert und kein „neu laden“ → `analysis.json` lesen.
 2. **Laden:** `concept2_analyze_result(result_id | date | type, rpe=…)`.
    Fehler „Concept2-Anmeldung fehlgeschlagen“: `concept2_login_status` aufrufen und den Weg aus `docs/concept2-tools.md`
-   Abschnitt 2 nennen (PC: `uv run scripts/concept2_login.py`; Cloud: `CONCEPT2_TOKENS_B64` setzen und
-   `log.concept2.com` in der Netzwerk-Policy freigeben).
+   Abschnitt 2 nennen. Sind `CONCEPT2_CLIENT_ID`/`CONCEPT2_CLIENT_SECRET` gesetzt und `log.concept2.com` erreichbar,
+   die Autorisierung direkt in der Session machen: `concept2_authorize_url` → Nutzer öffnet die URL und fügt die
+   Redirect-Adresse (`…?code=…&state=…`) ein → `concept2_exchange_code` → `concept2_token_blob` und den Nutzer bitten,
+   `CONCEPT2_TOKENS_B64` in der Cloud-Umgebung zu setzen. Fehlt beides: PC-Weg (`uv run scripts/concept2_login.py`).
 3. **Ausgabe** (immer diese Abschnitte):
    1. **Überblick** – Datum, Gerät, Distanz, Zeit, Ø-Pace, Ø-Watt, Ø-SPM, Ø-/Max-HF, Drag-Faktor, Programm.
    2. **Intervall-/Split-Tabelle** aus `summary_md` übernehmen (Pace, Watt, SPM, Ø-HF, Max-HF, HF-Anstieg, Pause).

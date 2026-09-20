@@ -190,6 +190,37 @@ def test_access_token_refreshes_when_stale(token_env: Path, monkeypatch: pytest.
     assert c2.access_token() == "new" and len(calls) == 1  # noch gültig → kein zweiter Aufruf
 
 
+def test_parse_code():
+    url = "http://localhost:8765/callback?code=abc123&state=s1"
+    assert c2.parse_code(url, "s1") == "abc123"
+    assert c2.parse_code(url, None) == "abc123"
+    assert c2.parse_code("  rawcode ", "s1") == "rawcode"
+    with pytest.raises(c2.Concept2AuthError):
+        c2.parse_code(url, "other")
+    with pytest.raises(c2.Concept2AuthError):
+        c2.parse_code("http://localhost:8765/callback?error=access_denied&code=", "s1")
+    with pytest.raises(c2.Concept2AuthError):
+        c2.parse_code("", "s1")
+
+
+def test_exchange_code_stores_tokens(token_env: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("CONCEPT2_CLIENT_ID", "cid")
+    monkeypatch.setenv("CONCEPT2_CLIENT_SECRET", "sec")
+    seen: list[dict] = []
+
+    def fake_post(form):
+        seen.append(form)
+        return {"access_token": "a1", "refresh_token": "r1", "expires_in": 3600, "scope": "user:read,results:read"}
+
+    monkeypatch.setattr(c2, "_post_token", fake_post)
+    tokens = c2.exchange_code("thecode")
+    assert seen[0]["grant_type"] == "authorization_code" and seen[0]["code"] == "thecode"
+    assert seen[0]["redirect_uri"] == "http://localhost:8765/callback"
+    assert tokens["client_id"] == "cid" and tokens["client_secret"] == "sec"
+    assert c2.load_tokens()["access_token"] == "a1"
+    assert c2.token_blob_b64()
+
+
 def test_access_token_missing(token_env: Path):
     with pytest.raises(c2.Concept2AuthError):
         c2.access_token()

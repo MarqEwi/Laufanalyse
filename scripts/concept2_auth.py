@@ -195,6 +195,26 @@ def authorize_url(state: str, scope: str = DEFAULT_SCOPE) -> str:
     return f"{authorize_endpoint()}?{urlencode(q)}"
 
 
+def parse_code(text: str, expected_state: str | None = None) -> str:
+    """Autorisierungscode aus der eingefügten Redirect-URL (…?code=…&state=…) oder aus dem nackten Code lesen.
+    Prüft state, wenn expected_state gesetzt ist und die URL einen state enthält."""
+    from urllib.parse import parse_qs, urlparse
+
+    text = text.strip()
+    if "code=" in text:
+        q = parse_qs(urlparse(text).query)
+        state = q.get("state", [""])[0]
+        if expected_state and state and state != expected_state:
+            raise Concept2AuthError("state in der eingefügten URL stimmt nicht – Autorisierung neu starten.")
+        code = q.get("code", [""])[0]
+        if not code:
+            raise Concept2AuthError("Kein code= in der eingefügten URL gefunden.")
+        return code
+    if not text:
+        raise Concept2AuthError("Kein Code angegeben.")
+    return text
+
+
 def _post_token(form: dict[str, str]) -> dict[str, Any]:
     import requests  # Import erst hier, damit --help ohne Abhängigkeit läuft
 

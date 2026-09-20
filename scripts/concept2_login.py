@@ -77,17 +77,6 @@ def _catch_code_locally(expected_state: str, timeout_s: int) -> str:
     return result["code"]
 
 
-def _code_from_input(text: str, expected_state: str) -> str:
-    text = text.strip()
-    if "code=" in text:
-        q = parse_qs(urlparse(text).query)
-        state = q.get("state", [""])[0]
-        if state and state != expected_state:
-            raise c2.Concept2AuthError("state in der eingefügten URL stimmt nicht – Vorgang neu starten.")
-        return q.get("code", [""])[0]
-    return text
-
-
 def smoke_test() -> None:
     client = c2.connect()
     print(f"Angemeldet als: {c2.whoami(client)}")
@@ -137,7 +126,7 @@ def main() -> int:
             print("Autorisierung beim Concept2 Logbook.\nURL:\n  " + url)
             if args.manual:
                 pasted = input("\nNach dem Bestätigen die Adresszeile der Zielseite (…?code=…&state=…) oder nur den Code einfügen: ")
-                code = _code_from_input(pasted, state)
+                code = c2.parse_code(pasted, state)
             else:
                 print(f"\nBrowser öffnet sich; warte auf {c2.redirect_uri()} …")
                 webbrowser.open(url)

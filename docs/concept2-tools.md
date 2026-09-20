@@ -38,8 +38,20 @@ Concept2-Formel `2,8 / (Pace je Meter)³` (nur RowErg/SkiErg).
    Cloud-Umgebung eintragen **und** `log.concept2.com` zu den erlaubten Domains der Umgebung hinzufügen. Der
    Session-Start-Hook schreibt die Tokens beim Start in den Token-Ordner. Live-Test: `concept2_login_status`.
 
+**Alternative ohne PC, direkt aus einer Claude-Code-Session (auch vom Handy):** Voraussetzung sind
+`CONCEPT2_CLIENT_ID` und `CONCEPT2_CLIENT_SECRET` als Umgebungsvariablen der Cloud-Umgebung und `log.concept2.com`
+in der Netzwerk-Policy. Dann:
+
+1. `concept2_authorize_url` → URL im Browser öffnen, bei Concept2 anmelden, „Allow“.
+2. Concept2 leitet auf `http://localhost:8765/callback?code=…&state=…` um. Die Seite lädt auf dem Handy nicht,
+   aber die Adresszeile enthält den Code: Adresse kopieren und in den Chat einfügen.
+3. `concept2_exchange_code(<eingefügte Adresse>)` → Tokens werden gespeichert, Antwort zeigt `logged_in_as`.
+4. `concept2_token_blob` → Wert als `CONCEPT2_TOKENS_B64` in der Cloud-Umgebung eintragen, damit spätere Sessions
+   ohne neue Autorisierung starten. Der Wert enthält auch Client-ID/-Secret; nur in die Umgebungsvariablen, nie ins Repo.
+
 Token-Erneuerung läuft automatisch über das Refresh-Token (Aufruf 2 min vor Ablauf bzw. bei 401). Wird das
-Refresh-Token ungültig: `concept2_login.py --force` am PC, dann `--show-token` und die Cloud-Variable aktualisieren.
+Refresh-Token ungültig: `concept2_login.py --force` am PC oder die Session-Autorisierung oben wiederholen, dann
+`CONCEPT2_TOKENS_B64` aktualisieren.
 
 | Variable | Zweck |
 |---|---|
@@ -55,6 +67,9 @@ Refresh-Token ungültig: `concept2_login.py --force` am PC, dann `--show-token` 
 | Tool | Parameter | Liefert |
 |---|---|---|
 | `concept2_login_status` | – | Token-Ordner, gesetzte Variablen, Host, Datenordner, `logged_in_as` / Fehlertext |
+| `concept2_authorize_url` | – | Schritt 1 der Autorisierung aus der Session: `url`, `state`, `redirect_uri` |
+| `concept2_exchange_code` | `code_or_redirect_url` | Schritt 2: Code (oder eingefügte Redirect-URL) gegen Tokens tauschen, speichern, `logged_in_as` |
+| `concept2_token_blob` | – | Token-Datei als base64 für `CONCEPT2_TOKENS_B64` |
 | `concept2_list_results` | `limit`=10, `type`? (`rower`, `skierg`, `bike` …), `from_date`?, `to_date`? | neueste zuerst: `result_id`, `date`, `start_local`, `type`, `type_de`, `workout_type`, `distance_m`, `time_str`, `pace_str`, `spm`, `hr_avg`, `hr_max`, `has_stroke_data`, `source`, `comments` |
 | `concept2_get_result` | `result_id` | `summary` (normalisiert), `splits[]`, `intervals[]` (je: `nr`, `start_s`, `time_s`, `distance_m`, `pace_s`/`pace_str`, `watts`, `spm`, `hr_avg`, `hr_max`, `hr_end`, `rest_time_s`), `raw` |
 | `concept2_analyze_result` | `result_id`?, `date`?, `type`?, `rpe`?, `out_dir`? (nichts = letzte Einheit) | `output_dir`, `summary_md` (Bericht), `coach_text` (Pace/HF/RPE als Textbaustein), `analysis` (`summary`, `segments` mit `hr_start_strokes`/`hr_end_strokes`/`hr_rise`, `intervals_stats`: Anzahl, Ø-Pace, Streuung, Spanne, Trend, Ø-HF, HF-Anstieg, `notes`) |
