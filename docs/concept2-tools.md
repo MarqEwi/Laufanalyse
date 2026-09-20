@@ -97,6 +97,15 @@ CLI am PC (gleiche Logik): `uv run scripts/concept2_export.py [--id … | --date
 
 ## 5. Bekannte Einschränkungen
 
+0. **Erster echter Datensatz (20.09.2026, ErgData Android):** RowErg 5×1000 m als `VariableInterval` mit
+   `rest_time` je Intervall (627 Schlagpunkte) und BikeErg 10 km als `FixedDistanceSplits` (5 Splits à 2000 m,
+   1494 Schlagpunkte) kamen wie erwartet an. **`date` im Result ist die Endzeit der Einheit**, nicht der Start
+   (Abgleich mit der Garmin-HF-Kurve: HF fällt genau nach `date` des Bike-Ergs ab). Für Zeitfenster gilt also
+   Start = `date` − (`time` + `rest_time`), auf die Minute genau. Bei Hyrox-Einheiten auf mehreren Geräten
+   erscheint nur das Gerät im Logbook, das mit ErgData verbunden war; die Ski-Erg-Abschnitte tauchten als
+   Pausen (~5 min) zwischen den Ruder-Intervallen auf. HF nur mit Gurt am PM5/ErgData, sonst aus Garmin
+   (`/laufanalyse`, Zeitfenster aus `date` ableiten).
+
 1. HF-Werte gibt es nur, wenn ein Gurt mit dem PM5 oder ErgData verbunden war; sonst `notes` und „HR: keine Daten“.
 2. Schlagdaten nur bei `stroke_data=true` (ErgData-Aufzeichnung). Ohne sie fehlt der HF-Anstieg innerhalb der Abschnitte.
 3. Bike Erg: Pace je 1000 m, keine Watt-Berechnung aus der Pace.
