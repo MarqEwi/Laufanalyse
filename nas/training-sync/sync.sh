@@ -22,6 +22,8 @@ else
   ssh-keyscan -t ed25519 github.com > /tmp/.ssh/known_hosts 2>/dev/null || echo "$(date '+%F %T') WARNUNG: ssh-keyscan github.com fehlgeschlagen"
 fi
 export GIT_SSH_COMMAND="ssh -i /tmp/.ssh/key -o UserKnownHostsFile=/tmp/.ssh/known_hosts -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
+# Falls /archiv einem anderen Nutzer gehört (z. B. nach Anlegen per SMB), git nicht mit "dubious ownership" abbrechen lassen
+git config --global --add safe.directory /archiv
 
 while true; do
   if [ -d /archiv/.git ]; then

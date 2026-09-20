@@ -27,6 +27,10 @@ services:
       - /volume1/Grundlagen/training/archiv:/archiv
       - /volume1/Grundlagen/training/sync/sync.sh:/sync.sh:ro
       - /volume1/Grundlagen/training/keys:/keys:ro
+      # ssh bricht mit "No user exists for uid" ab, wenn die UID im Container unbekannt ist:
+      # Nutzerliste des Hosts nur lesend einblenden (keine Passwörter, die liegen in /etc/shadow).
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
     mem_limit: 64m
     logging:
       driver: json-file
