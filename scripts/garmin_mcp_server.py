@@ -436,6 +436,7 @@ def concept2_login_status() -> dict[str, Any]:
         "client_id_in_token_file": bool(tokens.get("client_id")),
         "host": c2.host(),
         "data_dir": str(ce.base_dir(None).resolve()),
+        "access_token_expires_at": tokens.get("expires_at"),
     }
     try:
         info["logged_in_as"] = c2.whoami(_c2_or_raise())
@@ -443,6 +444,9 @@ def concept2_login_status() -> dict[str, Any]:
     except Exception as exc:  # noqa: BLE001
         info["ok"] = False
         info["error"] = str(exc)
+    info["token_refreshed_in_session"] = c2.REFRESHED_IN_SESSION
+    if (hint := c2.refresh_hint()):
+        info["hinweis"] = hint
     return info
 
 
@@ -533,7 +537,10 @@ def concept2_analyze_result(
     client = _c2_or_raise()
     rid = _c2_call(ce.resolve_result_id, client, result_id=result_id, date=date, type_=type)
     out, analysis = _c2_call(ce.export_and_analyze, client, rid, rpe=rpe, out_dir=out_dir)
-    return {"output_dir": str(out.resolve()), "summary_md": ce.render_markdown(analysis), "coach_text": ce.coach_text(analysis), "analysis": analysis}
+    res: dict[str, Any] = {"output_dir": str(out.resolve()), "summary_md": ce.render_markdown(analysis), "coach_text": ce.coach_text(analysis), "analysis": analysis}
+    if (hint := c2.refresh_hint()):
+        res["hinweis"] = hint
+    return res
 
 
 @mcp_server.tool()

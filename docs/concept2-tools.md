@@ -1,12 +1,15 @@
 # Concept2 Logbook (ErgData) in Claude Code: Anbindung, Tools, Parameter
 
-Stand: 19.09.2026. Ergänzt den Garmin-MCP-Server (`docs/garmin-tools.md`) um die Ergometer-Einheiten aus dem
+Stand: 20.09.2026. Ergänzt den Garmin-MCP-Server (`docs/garmin-tools.md`) um die Ergometer-Einheiten aus dem
 Concept2 Logbook: Rudern (RowErg), Ski Erg und Bike Erg, wie ErgData bzw. der PM5 sie hochlädt. Nur Lesezugriff.
 
-**Noch nicht live geprüft:** Die API-Struktur wurde am Quellcode des Python-Clients `pyconcept2` 0.1.0 (PyPI)
-und dessen Tests verifiziert (Endpunkte, Feldnamen, Einheiten). Ein Aufruf gegen das echte Logbook stand beim
-Bau noch aus, weil `log.concept2.com` in der Netzwerk-Policy der Cloud-Umgebung gesperrt ist und noch keine
-App registriert war. Erster Live-Test: Abschnitt 2, Schritt 4.
+**Live geprüft am 20.09.2026 (Cloud-Session, Konto Marc Ewers):** Autorisierung über `/oauth/authorize` und
+Code-Tausch über `/oauth/access_token` funktionieren; `GET /users/me` liefert u. a. `first_name`, `last_name`,
+`username`, `max_heart_rate`, `weight`, `roles`; `GET /users/me/results` liefert `data[]` + `meta.pagination`.
+Token-Verhalten: erstes Access-Token 1 h gültig, nach Refresh 7 Tage; **das Refresh-Token rotiert bei jedem
+Refresh** (altes wird ungültig). Die Feldnamen der Results wurden zusätzlich am Beispiel des Concept2
+„API Workout Validator“ und am Client `pyconcept2` 0.1.0 verifiziert; ein echtes Result mit Schlagdaten stand
+beim Test noch nicht im Logbook (0 Einheiten), das ist der letzte offene Punkt.
 
 ## 1. Was die API liefert
 
@@ -49,9 +52,12 @@ in der Netzwerk-Policy. Dann:
 4. `concept2_token_blob` → Wert als `CONCEPT2_TOKENS_B64` in der Cloud-Umgebung eintragen, damit spätere Sessions
    ohne neue Autorisierung starten. Der Wert enthält auch Client-ID/-Secret; nur in die Umgebungsvariablen, nie ins Repo.
 
-Token-Erneuerung läuft automatisch über das Refresh-Token (Aufruf 2 min vor Ablauf bzw. bei 401). Wird das
-Refresh-Token ungültig: `concept2_login.py --force` am PC oder die Session-Autorisierung oben wiederholen, dann
-`CONCEPT2_TOKENS_B64` aktualisieren.
+Token-Erneuerung läuft automatisch über das Refresh-Token (Aufruf 2 min vor Ablauf bzw. bei 401). **Weil das
+Refresh-Token dabei rotiert, ist danach der Wert in `CONCEPT2_TOKENS_B64` veraltet:** `concept2_login_status`
+und `concept2_analyze_result` liefern in dem Fall `hinweis` (Flag `token_refreshed_in_session`), dann
+`concept2_token_blob` aufrufen und die Variable neu setzen. Praktisch passiert das etwa alle 7 Tage (Laufzeit des
+Access-Tokens). Wird das Refresh-Token ungültig (z. B. weil eine alte Kopie verwendet wurde): Autorisierung
+wiederholen (Session-Weg oben oder `concept2_login.py --force` am PC), dann `CONCEPT2_TOKENS_B64` aktualisieren.
 
 | Variable | Zweck |
 |---|---|

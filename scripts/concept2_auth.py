@@ -42,6 +42,10 @@ ACCEPT_HEADER = "application/vnd.c2logbook.v1+json"
 USER_AGENT = "laufanalyse-concept2/1.0"
 REFRESH_MARGIN_S = 120  # Access-Token so früh erneuern
 
+# Live geprüft 20.09.2026: Concept2 rotiert das Refresh-Token bei jeder Erneuerung. Nach einem Refresh ist der
+# Wert in CONCEPT2_TOKENS_B64 (Cloud-Umgebung) veraltet und muss neu gesetzt werden – dieses Flag meldet das.
+REFRESHED_IN_SESSION = False
+
 
 class Concept2AuthError(RuntimeError):
     """Anmeldung nicht möglich (fehlende Zugangsdaten/Tokens)."""
@@ -284,7 +288,18 @@ def refresh_tokens(tokens: dict[str, Any] | None = None) -> dict[str, Any]:
         "refresh_token": str(tokens["refresh_token"]),
         "scope": str(tokens.get("scope") or DEFAULT_SCOPE),
     })
+    global REFRESHED_IN_SESSION
+    REFRESHED_IN_SESSION = True
     return _store_token_response(data, cid, sec, previous=tokens)
+
+
+def refresh_hint() -> str | None:
+    """Hinweis für den Nutzer, wenn in dieser Session ein Refresh stattfand (Refresh-Token rotiert)."""
+    if not REFRESHED_IN_SESSION:
+        return None
+    return ("Concept2-Token wurde in dieser Session erneuert; das Refresh-Token hat sich geändert. "
+            "Bitte CONCEPT2_TOKENS_B64 in der Cloud-Umgebung mit dem Wert aus concept2_token_blob aktualisieren, "
+            "sonst schlägt die Anmeldung in späteren Sessions fehl.")
 
 
 def access_token(force_refresh: bool = False) -> str:

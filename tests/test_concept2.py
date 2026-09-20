@@ -216,11 +216,14 @@ def test_access_token_refreshes_when_stale(token_env: Path, monkeypatch: pytest.
         return {"access_token": "new", "refresh_token": "r2", "expires_in": 3600, "token_type": "Bearer"}
 
     monkeypatch.setattr(c2, "_post_token", fake_post)
+    monkeypatch.setattr(c2, "REFRESHED_IN_SESSION", False)
+    assert c2.refresh_hint() is None
     assert c2.access_token() == "new"
     assert calls[0]["grant_type"] == "refresh_token" and calls[0]["refresh_token"] == "r1"
     saved = c2.load_tokens()
     assert saved["refresh_token"] == "r2" and saved["expires_at"] > time.time() + 3000
     assert c2.access_token() == "new" and len(calls) == 1  # noch gültig → kein zweiter Aufruf
+    assert c2.REFRESHED_IN_SESSION and "CONCEPT2_TOKENS_B64" in c2.refresh_hint()
 
 
 def test_parse_code():
