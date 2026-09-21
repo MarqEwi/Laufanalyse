@@ -433,22 +433,23 @@ def render_markdown(a: dict[str, Any]) -> str:
 
 
 def coach_text(a: dict[str, Any]) -> str:
-    """Kurzer Textbaustein für den Coach (z. B. TrainHeroic-Kommentar): Pace, HF, RPE."""
+    """Textbaustein für den Coach (TrainHeroic-Kommentar) im Format aus docs/coach-text.md:
+    Kopf in drei Zeilen (Einheit, HR, RPE), dann Blöcke – alles durch Leerzeilen getrennt, ohne Einrückung."""
     s, iv = a["summary"], a.get("intervals_stats") or {}
     unit = s["pace_unit_m"]
     L = [f"{s['type_de']} {s['date']}: {fmt_num(s['distance_m'], 0)} m in {s['time_str']}, Ø {s['pace_str']} /{unit} m"
          + (f", {fmt_num(s['watts'], 0)} W" if s.get("watts") else "") + (f", {s['spm']} spm" if s.get("spm") else "")]
+    L.append(f"HR avg {s['hr_avg']}, max {s['hr_max']}" if s.get("hr_avg") else "HR: keine Daten")
+    L.append(f"RPE: {fmt_num(a['rpe'], 0)}" if a.get("rpe") is not None else "RPE: (bitte ergänzen)")
     if a["is_interval_session"] and iv.get("count"):
         segs = a["segments"]
         paces = " / ".join(g["pace_str"] for g in segs)
-        L.append(f"{iv['count']}x{fmt_num(iv['distance_m'], 0)} m" if iv.get("same_distance") else f"{iv['count']} Intervalle")
+        L.append(f"{iv['count']}x{fmt_num(iv['distance_m'], 0)} m:" if iv.get("same_distance") else f"{iv['count']} Intervalle:")
         L.append(f"Pace: {paces} (Ø {iv['avg_pace_str']})")
-        hrs = " / ".join(str(g.get("hr_avg") or "–") for g in segs)
-        L.append(f"HR avg: {hrs} (Ø {iv['avg_hr'] or '–'}, max {iv['hr_max'] or '–'})" if iv.get("avg_hr") else "HR: keine Daten")
-    else:
-        L.append(f"HR avg {s['hr_avg']}, max {s['hr_max']}" if s.get("hr_avg") else "HR: keine Daten")
-    L.append(f"RPE: {fmt_num(a['rpe'], 0)}" if a.get("rpe") is not None else "RPE: (bitte ergänzen)")
-    return "\n".join(L)
+        if iv.get("avg_hr"):
+            hrs = " / ".join(str(g.get("hr_avg") or "–") for g in segs)
+            L.append(f"HR avg: {hrs} (Ø {iv['avg_hr']}, max {iv['hr_max'] or '–'})")
+    return "\n\n".join(L)
 
 
 # ----------------------------------------------------------------------------

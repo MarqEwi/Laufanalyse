@@ -18,6 +18,7 @@
 - Ergometer-Einheiten (Rudern, Ski Erg, Bike Erg aus ErgData/Concept2 Logbook) über die Skill `/ergoanalyse` und die
   Tools `mcp__garmin__concept2_*` desselben Servers; Workouts anlegen über `/workout`.
 - Tool-Referenz: `docs/garmin-tools.md` (Garmin), `docs/concept2-tools.md` (Concept2).
+- Coach-Text (Kommentar an Coach Engelhardt in TrainHeroic) immer im Format `docs/coach-text.md`.
 - Tests ohne Netz: `uv run --with pytest --with requests pytest -q tests/`.
 - Ordner und Dateien, die für den Nutzer angelegt werden (Archiv-Tage, Exporte, Projektordner), heißen
   `YYYY-MM-DD Titel`, z. B. `2026-09-20 Hyrox Training` (Wunsch des Nutzers vom 20.09.2026). Bestehende

@@ -23,7 +23,8 @@ Die NAS STEVENAS zieht das Repo alle 10 Minuten nach `/volume1/Grundlagen/traini
 - Ein Tag kann mehrfach ergänzt werden (neue Fotos, Coach-Text nach RPE): das Skript hängt an, dedupliziert
   Fotos per Hash und aktualisiert `index.json`. Nichts wird gelöscht; `auswertung.md` und `coach.txt` werden
   nur durch ausdrücklich übergebene Dateien ersetzt (die automatischen Vorstufen füllen nur leere Tage).
-- Der Coach-Text im Archiv ist der Text, der tatsächlich an den Coach ging (mit RPE); die automatischen
+- Der Coach-Text im Archiv ist der Text, der tatsächlich an den Coach ging (mit RPE, Format `docs/coach-text.md`;
+  passt der Nutzer den Text an, seine Fassung übernehmen); die automatischen
   `coach.txt` aus den Concept2-Ordnern enthalten „RPE: (bitte ergänzen)“ und sind nur Vorstufe.
 
 ## Ablauf in einer Cloud-Session

@@ -49,6 +49,11 @@ alles unter `data/garmin/<YYYY-MM-DD>_<id>/` und liefert den fertigen Bericht pl
    `$TRAINING_ARCHIV_DIR/2026/2026-06-01 Grundlagen/auswertung.md` (Stand 01.06.2026, bis zum nächsten Test).
 5. **Kurzfazit** – 3–4 Sätze Klartext: Was sagt die Einheit über Form und Ermüdung? Stütze dich auf Pace-Streuung (gleichmäßig = kontrolliert), Pace-Trend (langsamer werdend = zu schnell angegangen/ermüdet), HF-Drift bei gleicher Pace, HF-Anstieg innerhalb der Intervalle, Erholungszeit (kurz = gute Erholungsfähigkeit), Zonenverteilung, Wetter (Hitze erklärt höhere HF). Keine medizinischen Diagnosen. Optional Kontext über `mcp__garmin__get_training_context(date)` (Trainingsstatus, HRV, Schlaf), wenn der Nutzer nach Ursachen fragt.
 
+6. **Coach-Text** – zum Schluss als Codeblock, exakt im Format aus `docs/coach-text.md` (Kopf in drei Zeilen,
+   Leerzeile zwischen allen Blöcken, Gewichte als „Sled+100 kg“, Pace mit Einheit). RPE und Stationsgewichte
+   vom Nutzer erfragen, wenn er sie nicht genannt hat. Der Text, der wirklich an den Coach ging, kommt per
+   `/archiv` als `coach.txt` ins Archiv.
+
 `analysis.notes` (fehlende Daten, API-Fehler) am Ende nennen.
 
 ## Nachfragen mit bereits geladenen Daten

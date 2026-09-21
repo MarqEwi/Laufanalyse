@@ -39,7 +39,8 @@ Das Tool `concept2_analyze_result` lädt Zusammenfassung, Splits/Intervalle und 
    4. **Kurzfazit** – 3–4 Sätze: gleichmäßig = kontrolliert; langsamer werdend + HF steigend = zu schnell angegangen
       oder ermüdet; gleiche Pace bei sinkender HF über Wochen = Formverbesserung. Keine medizinischen Diagnosen.
    5. **Textbaustein für den Coach** – `coach_text` als Codeblock (Pace je Intervall, HR avg, RPE), zum Einfügen
-      in den Kommentar der Coaching-App.
+      in den Kommentar der Coaching-App. Format: `docs/coach-text.md` (Kopf in drei Zeilen, Leerzeile zwischen
+      allen Blöcken). Bei kombinierten Tagen (Lauf + Ergo) einen gemeinsamen Text nach derselben Vorlage bauen.
    `analysis.notes` am Ende nennen.
 
 ## Einheit vom PM5-Foto (nicht im Logbook)
