@@ -44,7 +44,9 @@ alles unter `data/garmin/<YYYY-MM-DD>_<id>/` und liefert den fertigen Bericht pl
 1. **Überblick** – Datum, Distanz, Dauer, Ø-Pace, Ø-HF, Max-HF, Höhenmeter, Wetter (`analysis.summary`, `analysis.weather`).
 2. **Intervall-/Lap-Tabelle** – pro Lap: Nr, Distanz, Zeit, Pace, Ø-HF, Max-HF, HF-Anstieg (`hr_end − hr_start`, mit beiden Werten), Kadenz. Belastung fett/markiert, Erholung/Aufwärmen/Auslaufen benannt (`laps[].type`).
 3. **Intervall-Auswertung** (nur `type == belastung`, aus `analysis.intervals`): Anzahl × Distanz, Ø-Pace, Ø-HF, Streuung (`pace_stdev_s_per_km`, Spanne), Trend (`trend_text`, `pace_trend_s_per_km_per_interval`, `hr_trend_bpm_per_interval`, erstes vs. letztes Intervall), Erholungszeit bis HF < Schwelle (`recovery_to_threshold_s_list`, Ø). Kein Intervall erkannt → sagen (Dauerlauf) und stattdessen Pace-/HF-Verlauf über die km-Laps beschreiben.
-4. **HF-Zonen** – Tabelle Zone / ab bpm / Minuten / Prozent (`analysis.hr_zones`).
+4. **HF-Zonen** – Tabelle Zone / ab bpm / Minuten / Prozent (`analysis.hr_zones`). Zusätzlich die Einheit gegen die
+   Coach-Zonen einordnen (Pace und HF, LTHR 174, Schwelle 4:17): Tabelle im Archiv unter
+   `$TRAINING_ARCHIV_DIR/2026/2026-06-01 Grundlagen/auswertung.md` (Stand 01.06.2026, bis zum nächsten Test).
 5. **Kurzfazit** – 3–4 Sätze Klartext: Was sagt die Einheit über Form und Ermüdung? Stütze dich auf Pace-Streuung (gleichmäßig = kontrolliert), Pace-Trend (langsamer werdend = zu schnell angegangen/ermüdet), HF-Drift bei gleicher Pace, HF-Anstieg innerhalb der Intervalle, Erholungszeit (kurz = gute Erholungsfähigkeit), Zonenverteilung, Wetter (Hitze erklärt höhere HF). Keine medizinischen Diagnosen. Optional Kontext über `mcp__garmin__get_training_context(date)` (Trainingsstatus, HRV, Schlaf), wenn der Nutzer nach Ursachen fragt.
 
 `analysis.notes` (fehlende Daten, API-Fehler) am Ende nennen.

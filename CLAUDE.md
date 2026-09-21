@@ -26,6 +26,8 @@
   `MarqEwi/training-archiv` (Skill `/archiv`, `scripts/archiv.py`, Doku `docs/nas-archiv.md`), nie in dieses
   Code-Repo. Die NAS spiegelt das Archiv nach `/volume1/Grundlagen/training/archiv` (`nas/training-sync`).
   Lokaler Klon am PC: `E:\Users\Marc\Claude Projekte\training-archiv` (`TRAINING_ARCHIV_DIR`).
+- Grundlagen (Coach-Zonen Pace/HF, Testwerte) liegen im Archiv als Tag `2026-06-01 Grundlagen`; Skills
+  `/laufanalyse` und `/workout` lesen die Zonen von dort.
 
 ## NAS-Umgebung (Projekt „training“ auf STEVENAS) – Kontext vom Nutzer, 20.09.2026
 

@@ -1,0 +1,4 @@
+# Dateien, die auf der NAS (Linux) laufen, immer mit LF auschecken – auch unter Windows (CRLF bricht den Shebang)
+*.sh text eol=lf
+nas/** text eol=lf
+.claude/hooks/* text eol=lf

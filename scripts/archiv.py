@@ -174,6 +174,7 @@ def archive_day(
         if not dry_run:
             (dest / "fotos").mkdir(parents=True, exist_ok=True)
             shutil.copy2(p, dest / "fotos" / name)
+            (dest / "fotos" / name).chmod(0o644)  # Uploads kommen mit 0600, im Archiv lesbar ablegen
     if rows and not dry_run:
         new = not idx.is_file()
         with idx.open("a", encoding="utf-8") as f:

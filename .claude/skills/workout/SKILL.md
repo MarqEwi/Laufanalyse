@@ -52,6 +52,9 @@ Datenquelle und Ziel ist der MCP-Server `garmin` (Tools `mcp__garmin__*`). Die W
   (geprüft 20.09.2026); der Sync passiert über die Garmin-Connect-App.
 - Schritt-Typen: `warmup`, `interval` (Belastung), `recovery`, `rest`, `cooldown`. Ende: `duration_s`,
   `distance_m` oder `"end": "lap"` (Rundentaste).
+- Coach-Zonen („Z3-4“, „Z1“) nie raten: Pace- und HF-Tabelle des Coaches liegt im Archiv unter
+  `$TRAINING_ARCHIV_DIR/2026/2026-06-01 Grundlagen/auswertung.md` (Pace Z4 4:14–4:30, Z3 4:32–4:51 usw.);
+  daraus `pace_min_km` bzw. `hr_bpm` ableiten und die Herleitung nennen.
 - Ziele: `hr_bpm [low, high]`, `hr_zone 1–5`, `pace_min_km ["schnell", "langsam"]` (nur Laufen/Gehen),
   sonst kein Ziel. Garmin verlangt bei HF immer Unter- und Obergrenze („HF unter 130“ → `[90, 130]`, das sagen).
 - `exercise` (bei `cardio`/`strength`): Übung aus dem Garmin-Katalog, die die Connect-App am Schritt anzeigt.
