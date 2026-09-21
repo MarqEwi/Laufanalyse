@@ -2,16 +2,20 @@
 # /volume1/Grundlagen/training/archiv. Nur ausgehende Verbindung (GitHub), kein offener Port,
 # Bridge-Netz reicht (kein LAN-Zugriff nötig, Hairpin-NAT spielt keine Rolle).
 #
-# Ablage auf der NAS:  /volume1/Grundlagen/training/sync/  (docker-compose.yml, sync.sh, .env)
+# Ablage auf der NAS:  /volume1/Grundlagen/training/sync/  (docker-compose.yml, Dockerfile, sync.sh, .env)
 #                      /volume1/Grundlagen/training/keys/training-archiv_deploy  (Deploy-Key, nur lesend)
 #                      /volume1/Grundlagen/training/archiv/                       (Ziel, Klon des Repos)
 # Start:  cd /volume1/Grundlagen/training/sync && docker compose up -d
 # Logs:   docker logs -f training-sync
 #
-# Image alpine/git ist multi-arch (arm64), ~30 MB; Container braucht < 20 MB RAM.
+# Basis alpine/git ist multi-arch (arm64), ~30 MB; Container braucht < 20 MB RAM.
 services:
   training-sync:
-    image: alpine/git:2.47.2
+    # Eigenes Image: alpine/git plus mosquitto-clients für die Statusmeldung (siehe Dockerfile).
+    # Bauen bzw. nach Änderungen aktualisieren:
+    #   cd /volume1/Grundlagen/training/sync && docker compose up -d --build
+    build: .
+    image: training-sync:local
     container_name: training-sync
     restart: unless-stopped
     entrypoint: ["/bin/sh", "/sync.sh"]
@@ -19,6 +23,14 @@ services:
       ARCHIV_REPO: ${ARCHIV_REPO:-git@github.com:MarqEwi/training-archiv.git}
       ARCHIV_BRANCH: ${ARCHIV_BRANCH:-main}
       INTERVAL: ${INTERVAL:-600}
+      # Zeitlimit für git clone/pull: ohne das kann eine hängende Verbindung zu GitHub die Schleife
+      # dauerhaft blockieren – der Container liefe weiter als "Up", ohne noch zu synchronisieren.
+      GIT_TIMEOUT: ${GIT_TIMEOUT:-300}
+      # Statusmeldung an den MQTT-Broker der NAS (leer = aus). Der Broker gehört zum Heizungsprojekt
+      # und darf laut Projektregeln mitbenutzt werden – aber nicht unter brunner/* oder homeassistant/*.
+      MQTT_HOST: ${MQTT_HOST:-}
+      MQTT_PORT: ${MQTT_PORT:-1883}
+      MQTT_TOPIC: ${MQTT_TOPIC:-training/sync/status}
     # UID/GID des NAS-Nutzers MarcEwers, damit die Dateien per SMB bearbeitbar sind:
     # in der PC-Session per `ssh MarcEwers@STEVENAS id` ermitteln und in .env eintragen.
     user: "${PUID:-1000}:${PGID:-1000}"
@@ -34,6 +46,11 @@ services:
       # wirkungslos – sie überschreibt /etc/localtime sogar, die Logs stünden dann in UTC.
       # Stattdessen die Zonendatei des Hosts einblenden und TZ nicht setzen, dann nutzt musl sie.
       - /usr/share/zoneinfo/Europe/Berlin:/etc/localtime:ro
+    # Der MQTT-Broker läuft im Host-Netz der NAS. Wegen des kaputten Hairpin-NAT ist er aus dem
+    # Bridge-Netz über die LAN-IP 192.168.2.101 NICHT erreichbar, über das Docker-Gateway dagegen schon.
+    # Deshalb MQTT_HOST=nas-host statt der LAN-IP – das erspart network_mode: host.
+    extra_hosts:
+      - "nas-host:host-gateway"
     mem_limit: 64m
     logging:
       driver: json-file

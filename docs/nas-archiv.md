@@ -52,8 +52,40 @@ Deploy-Key `SHA256:BWv08TWzO44E09hss8PrkHZ5reCcVqCl6u31qgLCzf4` bei GitHub ohne 
 GitHub-Hostkey geprüft (`SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU`). Erster Klon 53 MB,
 Container belegt 11 MB RAM von 64 MB Limit und keinen Port.
 
-Ressourcen: Image `alpine/git` ~30 MB, Container < 20 MB RAM, `mem_limit 64m`. Speicher wächst mit den Fotos,
-etwa 3 MB je Bild, bei fünf Bildern pro Trainingstag rund 5 GB pro Jahr. Bridge-Netz, kein Port.
+Ressourcen: Image `alpine/git` ~30 MB plus `mosquitto-clients` ~1 MB, Container < 20 MB RAM,
+`mem_limit 64m`. Speicher wächst mit den Fotos, etwa 3 MB je Bild, bei fünf Bildern pro Trainingstag
+rund 5 GB pro Jahr. Bridge-Netz, kein Port.
+
+## Überwachung
+
+Seit 21.09.2026 meldet `sync.sh` nach jedem Durchlauf per MQTT (retained) auf `training/sync/status`:
+
+```json
+{"status":"ok","zeitpunkt":"2026-09-21 09:42:36","commit":"4090cf2","meldung":"4090cf2 2026-06-01 Grundlagen"}
+```
+
+Bei `"status":"fehler"` steht der Grund in `meldung` (z. B. `Repository not found`, `Permission denied
+(publickey)`, `Zeitüberschreitung nach 300s`). `MQTT_HOST` in der `.env` leer lassen schaltet die Meldung ab.
+
+Der Broker ist der `mosquitto` des Heizungsprojekts, dessen Mitbenutzung die Projektregeln erlauben –
+`training/sync/*` liegt außerhalb von `brunner/*` und `homeassistant/*`. **Deshalb bewusst keine
+MQTT-Discovery**, die würde nach `homeassistant/*` schreiben. Sensor in Home Assistant von Hand anlegen:
+
+```yaml
+mqtt:
+  sensor:
+    - name: Trainingsarchiv-Sync
+      state_topic: training/sync/status
+      value_template: "{{ value_json.status }}"
+      json_attributes_topic: training/sync/status
+```
+
+Aus dem Bridge-Netz ist der Broker **nicht** über die LAN-IP erreichbar (kaputtes Hairpin-NAT der NAS),
+deshalb `MQTT_HOST=nas-host` über `extra_hosts: nas-host:host-gateway`. Das erspart `network_mode: host`.
+
+Zusätzlich begrenzt `GIT_TIMEOUT` (Vorgabe 300 s) jeden `git clone`/`pull`. Ohne das konnte eine hängende
+Verbindung zu GitHub die Schleife dauerhaft blockieren – der Container lief dann weiter als „Up", ohne noch
+zu synchronisieren.
 
 ## Betrieb
 
@@ -61,9 +93,12 @@ etwa 3 MB je Bild, bei fünf Bildern pro Trainingstag rund 5 GB pro Jahr. Bridge
 - PC-Session: Klon unter `E:\Users\Marc\Claude Projekte\training-archiv`, `/archiv <Datum>`; Fotos aus dem
   Backup-Ordner der UGREEN-App.
 - Sync stoppen/aktualisieren: nur `training-sync` (`docker compose down` im Ordner `sync/`), nie die Heizungs-Container.
-- Logs: `docker logs --tail 50 training-sync`. Häufigste Fehler: Deploy-Key nicht bei GitHub eingetragen
-  (`Permission denied (publickey)`), `/archiv` nicht leer und kein Repo (Ordner leeren), Hostkey unbekannt
-  (Schritt 4).
+- Nach Änderungen an `sync.sh` genügt `docker compose restart` (die Datei ist als Volume eingebunden);
+  nach Änderungen am `Dockerfile` `docker compose up -d --build`.
+- Logs: `docker logs --tail 50 training-sync`, mit `-t` für Docker-Zeitstempel (hilfreich, um Meldungen
+  einem Durchlauf vor oder nach einem Neustart zuzuordnen – stderr erscheint sonst außer der Reihe).
+  Häufigste Fehler: Deploy-Key nicht bei GitHub eingetragen (`Permission denied (publickey)`),
+  `/archiv` nicht leer und kein Repo (Ordner leeren), Hostkey unbekannt (Schritt 4).
 
 ## Offen
 
