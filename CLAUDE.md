@@ -29,8 +29,11 @@
 
 ## NAS-Umgebung (Projekt „training“ auf STEVENAS) – Kontext vom Nutzer, 20.09.2026
 
-Gilt für Sessions auf dem Windows-PC (Surface). Cloud-Sessions erreichen die NAS nicht; sie bereiten nur
-Dateien im Repo vor, die Ausführung auf der NAS passiert in der PC-Session.
+Gilt für Sessions auf den Windows-PCs des Nutzers: „Master PC“ (großer PC, bevorzugt für NAS-Arbeiten) und
+Surface (MARC-SURFACE). Cloud-Sessions erreichen die NAS nicht (kein SSH-Client, kein LAN); sie bereiten nur
+Dateien im Repo vor, die Ausführung auf der NAS passiert in der PC-Session. Jeder PC braucht seinen eigenen
+SSH-Schlüssel in `~/.ssh/authorized_keys` von MarcEwers auf der NAS; auf dem Surface ist das eingerichtet,
+auf dem Master PC zu Beginn prüfen (`ssh MarcEwers@STEVENAS id`, ersatzweise IP 192.168.2.101).
 
 ### Die NAS
 - Modell: UGREEN NASync DH2300 (2-Bay), Betriebssystem UGOS (UGREEN-eigenes Embedded-Linux), Architektur
@@ -40,8 +43,8 @@ Dateien im Repo vor, die Ausführung auf der NAS passiert in der PC-Session.
   MARC-SURFACE, Windows 11/PowerShell) hängt im selben Netz unter 192.168.2.117 (WLAN).
 
 ### Zugriff
-- SSH: `ssh MarcEwers@STEVENAS` – Public-Key-Auth ist eingerichtet, es kommt KEINE Passwortabfrage.
-  Alle NAS-Arbeiten laufen über diesen SSH-Zugang.
+- SSH: `ssh MarcEwers@STEVENAS` – Public-Key-Auth (Surface eingerichtet, Master PC siehe oben), dann
+  KEINE Passwortabfrage. Alle NAS-Arbeiten laufen über diesen SSH-Zugang.
 - Von Windows aus ist die NAS auch als SMB-Freigabe erreichbar: `\\STEVENAS\Grundlagen`.
 - Die UGOS-Weboberfläche bedient der Nutzer selbst im Browser; wenn dort Klicks nötig sind, anleiten.
 
