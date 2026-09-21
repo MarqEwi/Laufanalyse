@@ -29,22 +29,31 @@
 
 ## NAS-Umgebung (Projekt „training“ auf STEVENAS) – Kontext vom Nutzer, 20.09.2026
 
-Gilt für Sessions auf den Windows-PCs des Nutzers: „Master PC“ (großer PC, bevorzugt für NAS-Arbeiten) und
-Surface (MARC-SURFACE). Cloud-Sessions erreichen die NAS nicht (kein SSH-Client, kein LAN); sie bereiten nur
-Dateien im Repo vor, die Ausführung auf der NAS passiert in der PC-Session. Jeder PC braucht seinen eigenen
-SSH-Schlüssel in `~/.ssh/authorized_keys` von MarcEwers auf der NAS; auf dem Surface ist das eingerichtet,
-auf dem Master PC zu Beginn prüfen (`ssh MarcEwers@STEVENAS id`, ersatzweise IP 192.168.2.101).
+Gilt für Sessions auf den Windows-PCs des Nutzers: „Master PC“ (MASTERPC-MARC, großer PC, bevorzugt für
+NAS-Arbeiten, Repo unter `E:\Users\Marc\Claude Projekte\GarminConnect`) und Surface (MARC-SURFACE).
+Cloud-Sessions erreichen die NAS nicht (kein SSH-Client, kein LAN); sie bereiten nur Dateien im Repo vor,
+die Ausführung auf der NAS passiert in der PC-Session. Jeder PC braucht seinen eigenen SSH-Schlüssel in
+`~/.ssh/authorized_keys` von MarcEwers auf der NAS; auf Surface und Master PC ist das eingerichtet
+(Master PC seit 21.09.2026). Zu Beginn prüfen: `ssh MarcEwers@STEVENAS id` → `uid=1001(MarcEwers)
+gid=10(admin)`, u. a. in der Gruppe `docker`.
 
 ### Die NAS
 - Modell: UGREEN NASync DH2300 (2-Bay), Betriebssystem UGOS (UGREEN-eigenes Embedded-Linux), Architektur
   aarch64/ARM64, 4 GB RAM (fest verbaut).
 - Hostname: STEVENAS, feste IP im LAN: 192.168.2.101.
-- Heimnetz: 192.168.2.0/24, Router ist eine AVM Fritzbox (192.168.2.1, fritz.box). Der PC (Surface,
-  MARC-SURFACE, Windows 11/PowerShell) hängt im selben Netz unter 192.168.2.117 (WLAN).
+- Heimnetz: 192.168.2.0/24, Router ist eine AVM Fritzbox (192.168.2.1, fritz.box). Die PCs hängen im selben
+  Netz: Surface (MARC-SURFACE, Windows 11/PowerShell) unter 192.168.2.117 (WLAN), Master PC (MASTERPC-MARC)
+  unter 192.168.2.145.
+- Hostkey der NAS (ED25519): `SHA256:CnV8JtLnFa1Pz3kuFBGlGVjhd2c8SdPUo7KE7v1SlsE`.
 
 ### Zugriff
-- SSH: `ssh MarcEwers@STEVENAS` – Public-Key-Auth (Surface eingerichtet, Master PC siehe oben), dann
+- SSH: `ssh MarcEwers@STEVENAS` – Public-Key-Auth (Surface und Master PC eingerichtet), dann
   KEINE Passwortabfrage. Alle NAS-Arbeiten laufen über diesen SSH-Zugang.
+- ACHTUNG IPv6: Die Fritzbox löst `STEVENAS` auch auf eine IPv6-Adresse auf, der SSH-Dienst der NAS lauscht
+  aber nur auf IPv4. Ohne Vorkehrung läuft `ssh MarcEwers@STEVENAS` deshalb still in einen Timeout (Ping
+  antwortet trotzdem – täuscht Erreichbarkeit vor). Auf dem Master PC steht dafür in `~/.ssh/config`:
+  `Host STEVENAS stevenas` / `HostName 192.168.2.101` / `User MarcEwers` / `AddressFamily inet`.
+  Auf einem neuen PC entweder diesen Eintrag anlegen oder durchgehend die IP 192.168.2.101 verwenden.
 - Von Windows aus ist die NAS auch als SMB-Freigabe erreichbar: `\\STEVENAS\Grundlagen`.
 - Die UGOS-Weboberfläche bedient der Nutzer selbst im Browser; wenn dort Klicks nötig sind, anleiten.
 
@@ -75,6 +84,9 @@ Host-Netz, `restart: unless-stopped`:
 - homeassistant → Port 8123 (Home Assistant, produktiv genutzt!)
 - mosquitto → Port 1883 (MQTT-Broker)
 - brunner-bridge → eigener Python-Dienst (VNC/OCR zur Heizungssteuerung)
+
+Dazu kommt `port80-guard` (läuft seit ca. August 2026, Herkunft vom Nutzer nicht dokumentiert) – ebenfalls
+nicht anfassen. Eigener Container dieses Projekts: `training-sync` (siehe `docs/nas-archiv.md`).
 
 Regeln: Diese Container und deren Ordner NICHT verändern, NICHT neu starten, NICHT deren Ports (8123, 1883,
 evtl. 80 für emulated_hue) belegen. Vor der Portwahl für neue Dienste `docker ps` ansehen und belegte Ports
