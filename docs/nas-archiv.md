@@ -39,10 +39,10 @@ Dateien liegen im Code-Repo unter `nas/training-sync/` und werden nach `/volume1
    und Fingerabdruck mit https://docs.github.com/en/authentication/keychain vergleichen.
 5. **Dateien übertragen:** `docker-compose.yml`, `sync.sh`, `.env` (aus `.env.example`, PUID/PGID aus Schritt 1)
    nach `/volume1/Grundlagen/training/sync/`. Dann `chmod +x sync.sh`.
-   **Achtung Zeilenenden:** Git checkt die Dateien auf Windows mit CRLF aus; `sync.sh` startet dann im
-   Container nicht (kaputter Shebang). Vor dem Übertragen auf LF umstellen, z. B.
-   `tr -d '\r' < nas/training-sync/sync.sh > /tmp/sync.sh` und die bereinigte Datei kopieren. Danach mit
-   `md5sum` auf beiden Seiten vergleichen.
+   **Zeilenenden:** Die Dateien müssen LF behalten – mit CRLF startet `sync.sh` im Container nicht
+   (kaputter Shebang). Dafür sorgt seit 21.09.2026 die `.gitattributes` im Wurzelverzeichnis des Repos
+   (`nas/** text eol=lf`). Nach dem Übertragen trotzdem `md5sum` auf beiden Seiten
+   vergleichen; in einem älteren Klon einmal `git add --renormalize .` ausführen.
 6. **Start:** `ssh MarcEwers@STEVENAS "cd /volume1/Grundlagen/training/sync && docker compose up -d && sleep 20 && docker logs training-sync"`
    Erwartet: `geklont: git@github.com:MarqEwi/training-archiv.git`, danach alle 10 Minuten `pull ok`.
 7. **Kontrolle:** `\\STEVENAS\Grundlagen\training\archiv\2026\2026-09-20 Hyrox Training\` im Explorer öffnen.

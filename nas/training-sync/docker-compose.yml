@@ -19,7 +19,6 @@ services:
       ARCHIV_REPO: ${ARCHIV_REPO:-git@github.com:MarqEwi/training-archiv.git}
       ARCHIV_BRANCH: ${ARCHIV_BRANCH:-main}
       INTERVAL: ${INTERVAL:-600}
-      TZ: Europe/Berlin
     # UID/GID des NAS-Nutzers MarcEwers, damit die Dateien per SMB bearbeitbar sind:
     # in der PC-Session per `ssh MarcEwers@STEVENAS id` ermitteln und in .env eintragen.
     user: "${PUID:-1000}:${PGID:-1000}"
@@ -31,6 +30,10 @@ services:
       # Nutzerliste des Hosts nur lesend einblenden (keine Passwörter, die liegen in /etc/shadow).
       - /etc/passwd:/etc/passwd:ro
       - /etc/group:/etc/group:ro
+      # Zeitzone der Log-Zeitstempel: alpine/git enthält kein tzdata, deshalb bleibt die Variable TZ
+      # wirkungslos – sie überschreibt /etc/localtime sogar, die Logs stünden dann in UTC.
+      # Stattdessen die Zonendatei des Hosts einblenden und TZ nicht setzen, dann nutzt musl sie.
+      - /usr/share/zoneinfo/Europe/Berlin:/etc/localtime:ro
     mem_limit: 64m
     logging:
       driver: json-file
