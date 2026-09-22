@@ -38,4 +38,7 @@ Anmerkung: alle Läufe volle 3 min in 4:22 min/km Pace durchgezogen, Curved Runn
 5. Ergometer: `Ski Erg 2026-09-20: 5000 m in 21:37.5, Ø 2:09.8 /500 m, 160 W, 39 spm` als erste Zeile, dann
    HR-Zeile, RPE-Zeile, dann Intervallblock (`5x1000 m` / `Pace: … (Ø …)` / `HR avg: … (Ø …, max …)`), jeweils
    mit Leerzeile. `scripts/concept2_export.py` `coach_text()` erzeugt genau das.
-6. Nur Messwerte und Angaben des Nutzers, keine Interpretation außer in der Zeile „Anmerkung“.
+6. **Distanz-Intervalle (z. B. 800 m) als Gesamtsekunden je Wiederholung** mit Apostroph, nicht nur als Pace:
+   `800 m: 197' / 198' / 202' / 208' / 200' / 206'` (240' = 4 min), dahinter in Klammern die Ø-Pace
+   (`Ø 4:12 min/km`). Wunsch des Nutzers vom 22.09.2026. Zeit-Intervalle (3 min) bleiben bei Pace.
+7. Nur Messwerte und Angaben des Nutzers, keine Interpretation außer in der Zeile „Anmerkung“.
