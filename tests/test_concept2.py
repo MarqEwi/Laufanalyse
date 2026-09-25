@@ -88,12 +88,13 @@ def test_markdown_and_coach_text():
     md = ce.render_markdown(a)
     assert "# Ergometer-Analyse 2026-09-19 – Ski Erg" in md
     assert "## 2. Intervalle" in md
-    assert "| 1 | 1000 m | 4:00.0 | 2:00.0 |" in md
     assert "RPE 7" in md
     txt = ce.coach_text(a)
     assert txt.splitlines()[0].startswith("Ski Erg 2026-09-19: 5000 m in 20:30.0")
     assert "5x1000 m" in txt
     assert "Pace: 2:00.0 / 2:01.5 / 2:03.0 / 2:04.5 / 2:06.0 (Ø 2:03.0)" in txt
+    assert "Zeit: 240' / 243' / 246' / 249' / 252' (Ø 246')" in txt  # Ski/Row: Gesamtsekunden je Intervall
+    assert "| 1 | 1000 m | 4:00.0 (240') | 2:00.0 |" in md
     assert "RPE: 7" in txt
 
 

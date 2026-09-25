@@ -15,6 +15,8 @@ Das Tool `concept2_analyze_result` lädt Zusammenfassung, Splits/Intervalle und 
 
 - Deutsch. Pace `m:ss.z /500 m` (Bike Erg je 1000 m), Zeiten `mm:ss.z`, Distanzen in m, HF in bpm, Schlagfrequenz spm.
 - **Nie Werte schätzen.** Fehlt HF oder fehlen Schlagdaten, steht das in `analysis.notes`: nennen, nicht auffüllen.
+- Ski- und Row-Intervalle in Bericht und Coach-Text immer zusätzlich als Gesamtsekunden mit Apostroph
+  (`4:02.4 (242')`, im Coach-Text Zeile `Zeit: 242' / 194' / …`); Bike Erg bleibt bei m:ss.z (Wunsch 25.09.2026).
 - RPE kommt immer vom Nutzer. Fehlt sie, im Coach-Text „RPE: (bitte ergänzen)“ stehen lassen und nachfragen.
 - Rohe Schlagdaten nicht in den Chat laden; mit `analysis`/`summary_md` arbeiten, `strokes.csv` nur gezielt per Skript.
 

@@ -41,4 +41,6 @@ Anmerkung: alle Läufe volle 3 min in 4:22 min/km Pace durchgezogen, Curved Runn
 6. **Distanz-Intervalle (z. B. 800 m) als Gesamtsekunden je Wiederholung** mit Apostroph, nicht nur als Pace:
    `800 m: 197' / 198' / 202' / 208' / 200' / 206'` (240' = 4 min), dahinter in Klammern die Ø-Pace
    (`Ø 4:12 min/km`). Wunsch des Nutzers vom 22.09.2026. Zeit-Intervalle (3 min) bleiben bei Pace.
+   Gilt genauso für Ski Erg und RowErg (25.09.2026): `Ski: 242' / 194' / 143' / 97' / 48'`, dahinter die Pace
+   je Intervall. Bike Erg bleibt bei m:ss.z und Pace /1000 m.
 7. Nur Messwerte und Angaben des Nutzers, keine Interpretation außer in der Zeile „Anmerkung“.

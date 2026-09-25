@@ -363,6 +363,17 @@ def _row_hr(seg: dict[str, Any]) -> str:
     return "–"
 
 
+def secs_str(time_s: float) -> str:
+    """Gesamtsekunden mit Apostroph, Wunsch des Nutzers (25.09.2026): 4:02.4 → 242'. Nicht für Bike Erg."""
+    return f"{int(round(time_s))}'"
+
+
+def _with_secs(g: dict[str, Any], a: dict[str, Any]) -> str:
+    """Zeit eines Abschnitts: bei Ski/Row zusätzlich als Sekunden, z. B. '4:02.4 (242\')'."""
+    t = g["time_str"]
+    return t if a["summary"]["type"] == "bike" else f"{t} ({secs_str(g['time_s'])})"
+
+
 def render_markdown(a: dict[str, Any]) -> str:
     s, iv = a["summary"], a.get("intervals_stats") or {}
     unit = s["pace_unit_m"]
@@ -399,7 +410,7 @@ def render_markdown(a: dict[str, Any]) -> str:
         L.append("|---|---|---|---|---|---|---|---|---|---|")
         for g in segs:
             L.append(
-                f"| {g['nr']} | {fmt_num(g['distance_m'], 0, ' m')} | {g['time_str']} | {g['pace_str']} | {fmt_num(g.get('watts'), 0)} | "
+                f"| {g['nr']} | {fmt_num(g['distance_m'], 0, ' m')} | {_with_secs(g, a)} | {g['pace_str']} | {fmt_num(g.get('watts'), 0)} | "
                 f"{g.get('spm') or '–'} | {g.get('hr_avg') or '–'} | {g.get('hr_max') or '–'} | {_row_hr(g)} | "
                 f"{fmt_time(g['rest_time_s'], tenths=False) if g['rest_time_s'] else '–'} |"
             )
@@ -445,6 +456,8 @@ def coach_text(a: dict[str, Any]) -> str:
         segs = a["segments"]
         paces = " / ".join(g["pace_str"] for g in segs)
         L.append(f"{iv['count']}x{fmt_num(iv['distance_m'], 0)} m:" if iv.get("same_distance") else f"{iv['count']} Intervalle:")
+        if s["type"] != "bike":
+            L.append("Zeit: " + " / ".join(secs_str(g["time_s"]) for g in segs) + f" (Ø {secs_str(iv['avg_time_s'])})")
         L.append(f"Pace: {paces} (Ø {iv['avg_pace_str']})")
         if iv.get("avg_hr"):
             hrs = " / ".join(str(g.get("hr_avg") or "–") for g in segs)
