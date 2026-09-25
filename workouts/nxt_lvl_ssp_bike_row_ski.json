@@ -1,0 +1,19 @@
+{
+  "name": "NXT LVL SSP Bike Row Ski",
+  "sport": "cardio",
+  "description": "Coach Engelhardt, SSP-Option: 10k Bike, dann 5 Runden Row + Ski absteigend 1000-800-600-400-200 m, dann 10k Bike. Jeder Abschnitt endet per Lap-Taste.",
+  "steps": [
+    {"type": "warmup",   "end": "lap", "exercise": "indoor_bike", "note": "Bike 10 km bis Lap-Taste"},
+    {"type": "interval", "end": "lap", "note": "R1 Row 1000 m bis Lap-Taste"},
+    {"type": "interval", "end": "lap", "note": "R1 Ski 1000 m bis Lap-Taste"},
+    {"type": "interval", "end": "lap", "note": "R2 Row 800 m bis Lap-Taste"},
+    {"type": "interval", "end": "lap", "note": "R2 Ski 800 m bis Lap-Taste"},
+    {"type": "interval", "end": "lap", "note": "R3 Row 600 m bis Lap-Taste"},
+    {"type": "interval", "end": "lap", "note": "R3 Ski 600 m bis Lap-Taste"},
+    {"type": "interval", "end": "lap", "note": "R4 Row 400 m bis Lap-Taste"},
+    {"type": "interval", "end": "lap", "note": "R4 Ski 400 m bis Lap-Taste"},
+    {"type": "interval", "end": "lap", "note": "R5 Row 200 m bis Lap-Taste"},
+    {"type": "interval", "end": "lap", "note": "R5 Ski 200 m bis Lap-Taste"},
+    {"type": "cooldown", "end": "lap", "exercise": "indoor_bike", "note": "Bike 10 km bis Lap-Taste"}
+  ]
+}
