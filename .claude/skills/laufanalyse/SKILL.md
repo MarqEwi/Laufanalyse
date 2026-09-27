@@ -18,6 +18,10 @@ alles unter `data/garmin/<YYYY-MM-DD>_<id>/` und liefert den fertigen Bericht pl
 - Rohe Zeitreihen nicht in den Chat laden. Arbeite mit `analysis` / `summary_md`; `timeseries.csv` nur gezielt mit kleinen Skripten auswerten.
 - Belastungs-/Erholungs-Laps: Bei strukturierten Workouts liefert Garmin `intensityType` (Quelle `workout`); sonst Pace-Heuristik (schnelle Pace-Gruppe deutlich schneller als Gesamt-Ø = Belastung; langsame Laps davor = Aufwärmen, dazwischen = Erholung, danach = Auslaufen). Wirkt das Ergebnis unplausibel (z. B. Steigerungslauf), sag es und wiederhole mit anderem `work_factor` (Standard 0.93).
 - Erholungsschwelle: Standard 140 bpm (`recovery_hr`); nennt der Nutzer eine andere Zahl, verwende sie.
+- Hyrox-/Cardio-Aktivitäten (`indoor_cardio`, Profil Hybrid) haben über die API nur eine Runde, auch mit
+  Workout auf der Uhr (siehe `docs/garmin-tools.md`). Phasen dann aus `timeseries.csv` rekonstruieren:
+  Handgelenks-Kadenz ≥ 70 = Laufblock, Stationen dazwischen; Ergebnis mit Genauigkeit (~10 s) kennzeichnen,
+  Ergometer-Zeiten und Pace aus dem Concept2 Logbook oder PM5-Fotos übernehmen.
 
 ## Ablauf
 

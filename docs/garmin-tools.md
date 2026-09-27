@@ -150,3 +150,12 @@ ablehnen (17.09.2026 beobachtet, ebenso das Bearbeiten von `.claude/settings.jso
 FIT-Fallback (`analyze_fit` bzw. `garmin_export.py --fit`, auch ZIP aus Garmin Connect „Original exportieren“)
 erzeugt dieselbe Struktur; HF-Zonen kommen aus `session.time_in_hr_zone` (Zonengrenzen nur, wenn `hr_zone`-Nachrichten
 in der Datei sind).
+
+## Laps bei Cardio-Aktivitäten (Profil Hybrid) – Befund 21./25./27.09.2026
+
+Aktivitäten vom Typ `indoor_cardio` (Profil Cardio bzw. die Kopie „Hybrid“) liefern über `/splits` und
+`/typedsplits` nur eine Runde, auch wenn ein strukturiertes Workout auf der Uhr gestartet und Schritt für Schritt
+durchgeklickt wurde (27.09.: 20 Schritte, API: 1 Lap). Laufaktivitäten liefern die Schritte sauber (22.09.).
+Für Hyrox-Einheiten daher die Phasen aus der Zeitreihe rekonstruieren: Handgelenks-Kadenz 80–90 spm = Laufen,
+20–45 = Wall Balls/Burpees/Rudern, 0–10 = Ski Erg/Bike; Übergänge über HF-Einbrüche. Genauigkeit etwa 10 s bei
+5-s-Zeitreihe. Bei Wall Balls kann der optische Sensor den Kontakt verlieren (HF-Sturz um 50 bpm in 10 s).
