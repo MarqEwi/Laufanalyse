@@ -1,0 +1,124 @@
+{
+  "name": "NXT LVL AMRAP 40 Hyrox",
+  "sport": "cardio",
+  "description": "Coach Engelhardt: Main RPE 7-8.5, AMRAP 40 min (Belastung wie 10k): 4 min Run RP, Weakness by choice oder 40 Wall Balls, 4 min Run, 500 m Ski, 4 min Run, Weakness by choice (Burpees statt 50 m Walking Lunges). Drei Runden angelegt, bei 40 min abbrechen. CD 20 min Bike. Stationen enden per Lap-Taste.",
+  "steps": [
+    {
+      "type": "warmup",
+      "end": "lap",
+      "exercise": "run_walk",
+      "note": "Warm-up locker bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 240,
+      "exercise": "run",
+      "note": "R1 Laufen 4 min Race Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "wall_ball",
+      "note": "R1 40 Wall Balls bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 240,
+      "exercise": "run",
+      "note": "R1 Laufen 4 min Race Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R1 Ski 500 m bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 240,
+      "exercise": "run",
+      "note": "R1 Laufen 4 min Race Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "burpee",
+      "note": "R1 Burpees bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 240,
+      "exercise": "run",
+      "note": "R2 Laufen 4 min Race Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "wall_ball",
+      "note": "R2 40 Wall Balls bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 240,
+      "exercise": "run",
+      "note": "R2 Laufen 4 min Race Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R2 Ski 500 m bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 240,
+      "exercise": "run",
+      "note": "R2 Laufen 4 min Race Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "burpee",
+      "note": "R2 Burpees bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 240,
+      "exercise": "run",
+      "note": "R3 Laufen 4 min Race Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "wall_ball",
+      "note": "R3 40 Wall Balls bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 240,
+      "exercise": "run",
+      "note": "R3 Laufen 4 min Race Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R3 Ski 500 m bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 240,
+      "exercise": "run",
+      "note": "R3 Laufen 4 min Race Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "burpee",
+      "note": "R3 Burpees bis Lap-Taste"
+    },
+    {
+      "type": "cooldown",
+      "duration_s": 1200,
+      "exercise": "indoor_bike",
+      "note": "20 min Bike locker"
+    }
+  ]
+}
