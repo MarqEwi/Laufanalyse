@@ -1,0 +1,24 @@
+{
+  "name": "NXT LVL E90s Hyrox",
+  "sport": "cardio",
+  "description": "Coach Engelhardt, RPE 7. Block 1 E90s x 3-4 Runden: Run, Row, Run, Ski, 45 s Sled Push + Weakness (z.B. Wall Balls), Rest. Block 2 E90s x 3-4 Runden: Run, Ski, Run, Ski, 45 s Sled Pull + Weakness (z.B. BBJ = Burpee Broad Jumps), Rest. Jede Station ist ein 90-s-Slot, angelegt mit 4 Runden je Block (nach 3 Runden abbrechen erlaubt).",
+  "steps": [
+    {"type": "warmup", "end": "lap", "exercise": "run_walk", "note": "Warm-up locker bis Lap-Taste"},
+    {"repeat": 4, "steps": [
+      {"type": "interval", "duration_s": 90, "exercise": "run", "note": "Laufen 90 s RPE 7"},
+      {"type": "interval", "duration_s": 90, "note": "Row 90 s"},
+      {"type": "interval", "duration_s": 90, "exercise": "run", "note": "Laufen 90 s RPE 7"},
+      {"type": "interval", "duration_s": 90, "note": "Ski 90 s"},
+      {"type": "interval", "duration_s": 90, "exercise": "sled_push", "note": "Sled Push 45 s + Wall Balls"},
+      {"type": "rest", "duration_s": 90, "note": "Pause 90 s"}
+    ]},
+    {"repeat": 4, "steps": [
+      {"type": "interval", "duration_s": 90, "exercise": "run", "note": "Laufen 90 s RPE 7"},
+      {"type": "interval", "duration_s": 90, "note": "Ski 90 s"},
+      {"type": "interval", "duration_s": 90, "exercise": "run", "note": "Laufen 90 s RPE 7"},
+      {"type": "interval", "duration_s": 90, "note": "Ski 90 s"},
+      {"type": "interval", "duration_s": 90, "exercise": "sled_pull", "note": "Sled Pull 45 s + BBJ"},
+      {"type": "rest", "duration_s": 90, "note": "Pause 90 s"}
+    ]}
+  ]
+}
