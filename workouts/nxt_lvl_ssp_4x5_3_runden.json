@@ -1,0 +1,127 @@
+{
+  "name": "NXT LVL SSP 4x5 + 3 Runden",
+  "sport": "cardio",
+  "description": "Coach Engelhardt 01.10.2026, SSP: 4x5 min Run 10 s langsamer als Race Pace (RP 4:22 -> 4:32 min/km), danach 3 Runden 2 min Run + 60 BBJ / 60 Wall Balls / 60 Lunges + 2 min Run. Pausen laut Nutzer: 90-120 s nach jedem 5-min-Run und nach jeder Runde (angelegt mit 120 s, per Lap-Taste frueher beenden). BBJ = Burpee Broad Jumps.",
+  "steps": [
+    {
+      "type": "warmup",
+      "end": "lap",
+      "exercise": "run_walk",
+      "note": "Warm-up locker bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 300,
+      "exercise": "run",
+      "note": "Laufen 5 min 4:32/km (1/4)"
+    },
+    {
+      "type": "rest",
+      "duration_s": 120,
+      "note": "Pause 90-120 s"
+    },
+    {
+      "type": "interval",
+      "duration_s": 300,
+      "exercise": "run",
+      "note": "Laufen 5 min 4:32/km (2/4)"
+    },
+    {
+      "type": "rest",
+      "duration_s": 120,
+      "note": "Pause 90-120 s"
+    },
+    {
+      "type": "interval",
+      "duration_s": 300,
+      "exercise": "run",
+      "note": "Laufen 5 min 4:32/km (3/4)"
+    },
+    {
+      "type": "rest",
+      "duration_s": 120,
+      "note": "Pause 90-120 s"
+    },
+    {
+      "type": "interval",
+      "duration_s": 300,
+      "exercise": "run",
+      "note": "Laufen 5 min 4:32/km (4/4)"
+    },
+    {
+      "type": "rest",
+      "duration_s": 120,
+      "note": "Pause 90-120 s"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R1 Laufen 2 min"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "burpee",
+      "note": "R1 60 BBJ bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R1 Laufen 2 min"
+    },
+    {
+      "type": "rest",
+      "duration_s": 120,
+      "note": "Pause 90-120 s"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R2 Laufen 2 min"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "wall_ball",
+      "note": "R2 60 Wall Balls bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R2 Laufen 2 min"
+    },
+    {
+      "type": "rest",
+      "duration_s": 120,
+      "note": "Pause 90-120 s"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R3 Laufen 2 min"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "lunge",
+      "note": "R3 60 Lunges bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R3 Laufen 2 min"
+    },
+    {
+      "type": "cooldown",
+      "end": "lap",
+      "exercise": "run_walk",
+      "note": "Auslaufen bis Lap-Taste"
+    }
+  ]
+}
