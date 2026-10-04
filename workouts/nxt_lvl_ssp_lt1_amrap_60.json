@@ -1,0 +1,190 @@
+{
+  "name": "NXT LVL SSP LT1 AMRAP 60",
+  "sport": "cardio",
+  "description": "Coach Engelhardt 05.10.2026, SSP LT1, ganze Einheit RPE 3-4 (Talking Pace), for completion. 60 min AMRAP: 3 min Run, 20 m Sled Push, 1000 m Ski, 20 m Sled Pull, 4 min Run, 70 m Carry, 5 min Run, 50 m Walking Lunges, 1000 m Row, 10/10/10 Wall Balls. Drei Runden angelegt, bei 60 min abbrechen. Skip, wenn das Teamwod sehr hart war.",
+  "steps": [
+    {
+      "type": "warmup",
+      "end": "lap",
+      "exercise": "run_walk",
+      "note": "Warm-up locker bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 180,
+      "exercise": "run",
+      "note": "R1 Laufen 3 min Talking Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "sled_push",
+      "note": "R1 Sled Push 20 m bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R1 Ski 1 km bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "sled_pull",
+      "note": "R1 Sled Pull 20 m bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 240,
+      "exercise": "run",
+      "note": "R1 Laufen 4 min Talking Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R1 Carry 70 m bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 300,
+      "exercise": "run",
+      "note": "R1 Laufen 5 min Talking Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "lunge",
+      "note": "R1 Walking Lunges 50 m bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R1 Row 1 km bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "wall_ball",
+      "note": "R1 Wall Balls 10/10/10 bis Lap"
+    },
+    {
+      "type": "interval",
+      "duration_s": 180,
+      "exercise": "run",
+      "note": "R2 Laufen 3 min Talking Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "sled_push",
+      "note": "R2 Sled Push 20 m bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R2 Ski 1 km bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "sled_pull",
+      "note": "R2 Sled Pull 20 m bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 240,
+      "exercise": "run",
+      "note": "R2 Laufen 4 min Talking Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R2 Carry 70 m bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 300,
+      "exercise": "run",
+      "note": "R2 Laufen 5 min Talking Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "lunge",
+      "note": "R2 Walking Lunges 50 m bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R2 Row 1 km bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "wall_ball",
+      "note": "R2 Wall Balls 10/10/10 bis Lap"
+    },
+    {
+      "type": "interval",
+      "duration_s": 180,
+      "exercise": "run",
+      "note": "R3 Laufen 3 min Talking Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "sled_push",
+      "note": "R3 Sled Push 20 m bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R3 Ski 1 km bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "sled_pull",
+      "note": "R3 Sled Pull 20 m bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 240,
+      "exercise": "run",
+      "note": "R3 Laufen 4 min Talking Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R3 Carry 70 m bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 300,
+      "exercise": "run",
+      "note": "R3 Laufen 5 min Talking Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "lunge",
+      "note": "R3 Walking Lunges 50 m bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R3 Row 1 km bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "wall_ball",
+      "note": "R3 Wall Balls 10/10/10 bis Lap"
+    },
+    {
+      "type": "cooldown",
+      "end": "lap",
+      "exercise": "run_walk",
+      "note": "Auslaufen bis Lap-Taste"
+    }
+  ]
+}
