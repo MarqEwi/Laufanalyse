@@ -1,0 +1,150 @@
+{
+  "name": "NXT LVL SSP 4x12 AMRAP",
+  "sport": "cardio",
+  "description": "Coach Engelhardt 04.10.2026, SSP, 4x12 min RPE 7: je Block Buy-in Row/Ski im Wechsel 1 km, dann AMRAP ca. 8 min (2 min Run, 2 min Station, 2 min Run, 2 min Station). Stationen: B1 Sled Push, B2 Sled Pull, B3 Wall Balls, B4 BBJ (Burpee Broad Jumps). Pause zwischen den Bloecken offen (Lap-Taste).",
+  "steps": [
+    {
+      "type": "warmup",
+      "end": "lap",
+      "exercise": "run_walk",
+      "note": "Warm-up locker bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "B1 Row 1 km bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "B1 Laufen 2 min RPE 7"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "sled_push",
+      "note": "B1 Sled Push 2 min"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "B1 Laufen 2 min RPE 7"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "sled_push",
+      "note": "B1 Sled Push 2 min"
+    },
+    {
+      "type": "rest",
+      "end": "lap",
+      "note": "Pause bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "B2 Ski 1 km bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "B2 Laufen 2 min RPE 7"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "sled_pull",
+      "note": "B2 Sled Pull 2 min"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "B2 Laufen 2 min RPE 7"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "sled_pull",
+      "note": "B2 Sled Pull 2 min"
+    },
+    {
+      "type": "rest",
+      "end": "lap",
+      "note": "Pause bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "B3 Row 1 km bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "B3 Laufen 2 min RPE 7"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "wall_ball",
+      "note": "B3 Wall Balls 2 min"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "B3 Laufen 2 min RPE 7"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "wall_ball",
+      "note": "B3 Wall Balls 2 min"
+    },
+    {
+      "type": "rest",
+      "end": "lap",
+      "note": "Pause bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "B4 Ski 1 km bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "B4 Laufen 2 min RPE 7"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "burpee",
+      "note": "B4 BBJ 2 min"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "B4 Laufen 2 min RPE 7"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "burpee",
+      "note": "B4 BBJ 2 min"
+    },
+    {
+      "type": "cooldown",
+      "end": "lap",
+      "exercise": "run_walk",
+      "note": "Auslaufen bis Lap-Taste"
+    }
+  ]
+}
