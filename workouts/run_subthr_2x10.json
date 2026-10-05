@@ -7,7 +7,7 @@
     {"type": "interval", "duration_s": 120, "note": "2 min Aktivierung zuegig"},
     {"type": "recovery", "duration_s": 60,  "note": "1 min gehen"},
     {"repeat": 2, "steps": [
-      {"type": "interval", "duration_s": 600, "target": {"pace_min_km": ["4:15", "4:51"]}, "note": "10 min Z3 vorsichtig Z4"},
+      {"type": "interval", "duration_s": 600, "target": {"pace_min_km": ["4:15", "4:51"]}, "note": "10 min Z3-Z4 bis 4:25"},
       {"type": "recovery", "duration_s": 120, "note": "2 min easy traben"}
     ]},
     {"type": "cooldown", "duration_s": 600, "target": {"pace_min_km": ["5:31", "6:30"]}, "note": "10 min Z1 auslaufen"}
