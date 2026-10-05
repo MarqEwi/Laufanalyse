@@ -1,13 +1,13 @@
 {
   "name": "Run SubTHR 2x10",
   "sport": "running",
-  "description": "Coach Engelhardt 06.10.2026: Run SubTHR, RPE 7. WA 10 min mit 2 min Aktivierung, 1 min gehen, 2x (10 min Z3 vorsichtig Z4, Pace 4:25-4:51, 2 min easy), 10 min Z1. Sub-Schwelle: Schwelle 4:17 nicht anlaufen.",
+  "description": "Coach Engelhardt 06.10.2026: Run SubTHR, RPE 7. WA 10 min mit 2 min Aktivierung, 1 min gehen, 2x (10 min Z3 vorsichtig Z4, Pace 4:15-4:51, 2 min easy), 10 min Z1. Sub-Schwelle: Schwelle 4:17 nicht anlaufen.",
   "steps": [
     {"type": "warmup",   "duration_s": 480, "note": "8 min locker einlaufen"},
     {"type": "interval", "duration_s": 120, "note": "2 min Aktivierung zuegig"},
     {"type": "recovery", "duration_s": 60,  "note": "1 min gehen"},
     {"repeat": 2, "steps": [
-      {"type": "interval", "duration_s": 600, "target": {"pace_min_km": ["4:25", "4:51"]}, "note": "10 min Z3 vorsichtig Z4"},
+      {"type": "interval", "duration_s": 600, "target": {"pace_min_km": ["4:15", "4:51"]}, "note": "10 min Z3 vorsichtig Z4"},
       {"type": "recovery", "duration_s": 120, "note": "2 min easy traben"}
     ]},
     {"type": "cooldown", "duration_s": 600, "target": {"pace_min_km": ["5:31", "6:30"]}, "note": "10 min Z1 auslaufen"}
