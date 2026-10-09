@@ -1,0 +1,19 @@
+{
+  "name": "NXT LVL SSP 5x5 + 3 Runden",
+  "sport": "cardio",
+  "description": "Coach Engelhardt, Plan vom 08.10.2026, SSP: 5x 5 min Run 5-10 s langsamer als RP (Z3-4, bei RP 4:12 also 4:17-4:22), 60 s Pause zwischen den Laeufen (Wunsch des Nutzers), into 3x (3 min Run RP + 2 min Hyrox-Uebung by weakness: R1 Sled Push, R2 Burpees, R3 Wall Balls). For completion.",
+  "steps": [
+    {"type": "warmup", "end": "lap", "exercise": "run_walk", "note": "Warm-up locker bis Lap-Taste"},
+    {"repeat": 5, "steps": [
+      {"type": "interval", "duration_s": 300, "exercise": "run", "note": "Laufen 5 min 4:17-4:22 Pace"},
+      {"type": "rest", "duration_s": 60, "note": "60 s Pause"}
+    ]},
+    {"type": "interval", "duration_s": 180, "exercise": "run", "note": "R1 Laufen 3 min Race Pace"},
+    {"type": "interval", "duration_s": 120, "exercise": "sled_push", "note": "R1 Sled Push 2 min"},
+    {"type": "interval", "duration_s": 180, "exercise": "run", "note": "R2 Laufen 3 min Race Pace"},
+    {"type": "interval", "duration_s": 120, "exercise": "burpee", "note": "R2 Burpees 2 min"},
+    {"type": "interval", "duration_s": 180, "exercise": "run", "note": "R3 Laufen 3 min Race Pace"},
+    {"type": "interval", "duration_s": 120, "exercise": "wall_ball", "note": "R3 Wall Balls 2 min"},
+    {"type": "cooldown", "end": "lap", "exercise": "run_walk", "note": "Auslaufen bis Lap-Taste"}
+  ]
+}
