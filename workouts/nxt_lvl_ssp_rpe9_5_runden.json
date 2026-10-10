@@ -1,0 +1,132 @@
+{
+  "name": "NXT LVL SSP RPE 9 5 Runden",
+  "sport": "cardio",
+  "description": "Coach Engelhardt 11.10.2026, SSP RPE 9, 5 Runden: 2 min Run RP into Uebung into 2 min Run RP, dann 60 s Pause (Wunsch des Nutzers). Uebungen: R1 40 m BBJ, R2 500 m Row, R3 100 m Carry, R4 50 Sandbag Lunges, R5 50 Wall Balls. For completion.",
+  "steps": [
+    {
+      "type": "warmup",
+      "end": "lap",
+      "exercise": "run_walk",
+      "note": "Warm-up locker bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R1 Laufen 2 min Race Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R1 40 m BBJ bis Lap-Taste",
+      "exercise": "burpee"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R1 Laufen 2 min Race Pace"
+    },
+    {
+      "type": "rest",
+      "duration_s": 60,
+      "note": "R1 60 s Pause"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R2 Laufen 2 min Race Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R2 Row 500 m bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R2 Laufen 2 min Race Pace"
+    },
+    {
+      "type": "rest",
+      "duration_s": 60,
+      "note": "R2 60 s Pause"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R3 Laufen 2 min Race Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R3 Carry 100 m bis Lap-Taste"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R3 Laufen 2 min Race Pace"
+    },
+    {
+      "type": "rest",
+      "duration_s": 60,
+      "note": "R3 60 s Pause"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R4 Laufen 2 min Race Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R4 50 Sandbag Lunges bis Lap-Taste",
+      "exercise": "lunge"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R4 Laufen 2 min Race Pace"
+    },
+    {
+      "type": "rest",
+      "duration_s": 60,
+      "note": "R4 60 s Pause"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R5 Laufen 2 min Race Pace"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R5 50 Wall Balls bis Lap-Taste",
+      "exercise": "wall_ball"
+    },
+    {
+      "type": "interval",
+      "duration_s": 120,
+      "exercise": "run",
+      "note": "R5 Laufen 2 min Race Pace"
+    },
+    {
+      "type": "rest",
+      "duration_s": 60,
+      "note": "R5 60 s Pause"
+    },
+    {
+      "type": "cooldown",
+      "end": "lap",
+      "exercise": "run_walk",
+      "note": "Auslaufen bis Lap-Taste"
+    }
+  ]
+}
