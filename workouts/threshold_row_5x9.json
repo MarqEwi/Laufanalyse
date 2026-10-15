@@ -1,0 +1,13 @@
+{
+  "name": "Threshold Row 5x9",
+  "sport": "cardio",
+  "description": "Coach Engelhardt 15.10.2026, Threshold Row am Rudergeraet: 10 min easy WA, 5x 9 min RPE 7 mit 90 s easy, 10 min CD. Am PM5 parallel als Intervall-Workout Zeit 9:00 / Pause 1:30 einstellen, damit die Splits im Concept2 Logbook landen.",
+  "steps": [
+    {"type": "warmup", "duration_s": 600, "note": "10 min Row easy einrudern"},
+    {"repeat": 5, "steps": [
+      {"type": "interval", "duration_s": 540, "note": "9 min Row Schwelle RPE 7"},
+      {"type": "recovery", "duration_s": 90, "note": "90 s Row easy"}
+    ]},
+    {"type": "cooldown", "duration_s": 600, "note": "10 min Row easy ausrudern"}
+  ]
+}
