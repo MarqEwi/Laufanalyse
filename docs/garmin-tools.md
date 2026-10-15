@@ -159,3 +159,11 @@ durchgeklickt wurde (27.09.: 20 Schritte, API: 1 Lap). Laufaktivitäten liefern 
 Für Hyrox-Einheiten daher die Phasen aus der Zeitreihe rekonstruieren: Handgelenks-Kadenz 80–90 spm = Laufen,
 20–45 = Wall Balls/Burpees/Rudern, 0–10 = Ski Erg/Bike; Übergänge über HF-Einbrüche. Genauigkeit etwa 10 s bei
 5-s-Zeitreihe. Bei Wall Balls kann der optische Sensor den Kontakt verlieren (HF-Sturz um 50 bpm in 10 s).
+
+## Workouts im Profil „Rudern Indoor“ (Befund 15.10.2026)
+
+Ein als `cardio` angelegtes Workout lässt sich auf der Fenix 5X Plus auch im Profil „Rudern Indoor“ starten
+(Kalender-Workout des Tages). Die Aktivität kommt dann als `indoor_rowing` zurück **mit allen Schritten als Laps**
+(`workout_step` gesetzt), anders als bei `indoor_cardio`. Nachteil: Die optische HF am Handgelenk fällt auf dem
+Ruderergometer regelmäßig aus (15.10.: Ø 96 bei 227 W, unplausibel), für HF am Rudergerät ist ein Brustgurt am
+PM5/ErgData nötig. Keine Distanz/Kadenz in der Zeitreihe; Pace, Watt und SPM kommen aus dem Concept2 Logbook.
