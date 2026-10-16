@@ -1,0 +1,13 @@
+{
+  "name": "Threshold SSP 4x8",
+  "sport": "cardio",
+  "description": "Coach Engelhardt 16.10.2026, Threshold SSP (B. Conditioning): 10 min easy WA, 4x 8 min AMRAP-Leiter 10 BBJ + 10 Lunges + 10 Wall Balls, jede Runde +5 Wdh. (10/15/20/...), je Block neu bei 10, 90 s easy zwischen den Bloecken, 10 min CD.",
+  "steps": [
+    {"type": "warmup", "duration_s": 600, "exercise": "run_walk", "note": "10 min easy Warm-up"},
+    {"repeat": 4, "steps": [
+      {"type": "interval", "duration_s": 480, "note": "8 min BBJ/Lunges/WB +5 je Rd"},
+      {"type": "recovery", "duration_s": 90, "note": "90 s easy"}
+    ]},
+    {"type": "cooldown", "duration_s": 600, "exercise": "run_walk", "note": "10 min easy Cooldown"}
+  ]
+}
