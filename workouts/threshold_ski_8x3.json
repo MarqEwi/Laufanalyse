@@ -1,0 +1,13 @@
+{
+  "name": "Threshold Ski 8x3",
+  "sport": "cardio",
+  "description": "Coach Engelhardt 20.10.2026, Double Threshold reduziert, Teil B, Threshold Ski am Ski Erg: 10 min easy WA, 8x 3 min RPE 7 mit 90 s easy, 10 min CD. Am PM5 parallel als Intervall-Workout Zeit 3:00 / Pause 1:30 einstellen, damit die Splits im Concept2 Logbook landen.",
+  "steps": [
+    {"type": "warmup", "duration_s": 600, "note": "10 min Ski easy einskaten"},
+    {"repeat": 8, "steps": [
+      {"type": "interval", "duration_s": 180, "note": "3 min Ski Schwelle RPE 7"},
+      {"type": "recovery", "duration_s": 90, "note": "90 s Ski easy"}
+    ]},
+    {"type": "cooldown", "duration_s": 600, "note": "10 min Ski easy ausfahren"}
+  ]
+}
