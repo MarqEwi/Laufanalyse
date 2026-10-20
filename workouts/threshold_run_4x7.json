@@ -1,0 +1,13 @@
+{
+  "name": "Threshold Run 4x7",
+  "sport": "running",
+  "description": "Coach Engelhardt 20.10.2026: Double Threshold reduziert (Teil A, zweite Einheit mind. 4-6 h auseinander). Threshold Run: 10 min easy WA, 4x 7 min RPE 7 (Pace 4:15-4:25 laut Coach) mit 90 s easy, 10 min CD.",
+  "steps": [
+    {"type": "warmup",   "duration_s": 600, "note": "10 min easy einlaufen"},
+    {"repeat": 4, "steps": [
+      {"type": "interval", "duration_s": 420, "target": {"pace_min_km": ["4:15", "4:25"]}, "note": "7 min Schwelle RPE 7"},
+      {"type": "recovery", "duration_s": 90, "note": "90 s easy traben"}
+    ]},
+    {"type": "cooldown", "duration_s": 600, "target": {"pace_min_km": ["5:31", "6:30"]}, "note": "10 min Z1 auslaufen"}
+  ]
+}
