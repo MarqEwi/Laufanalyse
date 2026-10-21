@@ -664,19 +664,32 @@ def compact(r: dict[str, Any]) -> dict[str, Any]:
 
 
 def list_results(client: c2.Concept2Client, *, limit: int = 10, type_: str | None = None, from_date: str | None = None, to_date: str | None = None) -> list[dict[str, Any]]:
-    """Neueste zuerst. Die API liefert aufsteigend nach Datum; deshalb über die letzte Seite gehen."""
+    """Neueste zuerst. Die API lieferte früher aufsteigend nach Datum (Neuestes auf der letzten Seite), seit
+    Oktober 2026 absteigend (Neuestes auf Seite 1). Deshalb erste und letzte Seite laden, zusammenführen, sortieren."""
     number = max(1, min(limit, 250))
     first, meta = client.results(from_date=from_date, to_date=to_date, type_=type_, number=number, page=1)
     total_pages = int(meta.get("total_pages") or 1)
-    rows = first
+    rows = list(first)
     if total_pages > 1:
         last, _ = client.results(from_date=from_date, to_date=to_date, type_=type_, number=number, page=total_pages)
-        rows = last
-        if len(rows) < number and total_pages > 2:
+        rows += last
+        if len(last) < number and total_pages > 2:
             prev, _ = client.results(from_date=from_date, to_date=to_date, type_=type_, number=number, page=total_pages - 1)
-            rows = prev + rows
-    rows = sorted(rows, key=lambda r: (str(r.get("date_utc") or r.get("date") or ""), r.get("id") or 0), reverse=True)
-    return rows[:limit]
+            rows += prev
+
+    def _key(r: dict[str, Any]) -> tuple[str, int]:
+        return (str(r.get("date_utc") or r.get("date") or ""), int(r.get("id") or 0))
+
+    seen: set[int] = set()
+    unique = []
+    for r in rows:
+        rid = int(r.get("id") or 0)
+        if rid in seen:
+            continue
+        seen.add(rid)
+        unique.append(r)
+    unique.sort(key=_key, reverse=True)
+    return unique[:limit]
 
 
 def resolve_result_id(client: c2.Concept2Client, *, result_id: int | None, date: str | None, type_: str | None) -> int:
