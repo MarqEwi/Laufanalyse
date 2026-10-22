@@ -1,0 +1,13 @@
+{
+  "name": "Threshold Row 4x8",
+  "sport": "cardio",
+  "description": "Coach Engelhardt 22.10.2026, Threshold Row am Rudergeraet: 10 min easy WA, 4x 8 min RPE 7 (1:53-1:55 /500 m) mit 90 s easy, 10 min CD. Am PM5 parallel als Intervall-Workout Zeit 8:00 / Pause 1:30 einstellen und ErgData verbinden, damit die Splits im Concept2 Logbook landen. Uhr im Profil Rudern Indoor starten (liefert Laps).",
+  "steps": [
+    {"type": "warmup", "duration_s": 600, "note": "10 min Row easy einrudern"},
+    {"repeat": 4, "steps": [
+      {"type": "interval", "duration_s": 480, "note": "8 min Row 1:53-1:55 RPE 7"},
+      {"type": "recovery", "duration_s": 90, "note": "90 s Row easy"}
+    ]},
+    {"type": "cooldown", "duration_s": 600, "note": "10 min Row easy ausrudern"}
+  ]
+}
