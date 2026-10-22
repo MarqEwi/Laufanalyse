@@ -1,0 +1,118 @@
+{
+  "name": "SSP Doubles-Rhythmus 6 Runden",
+  "sport": "cardio",
+  "description": "Coach Engelhardt 22.10.2026, SSP Doubles-Rhythmus, For Completion: 10 min easy WA. Main 6x 500 m Run @ 3:40-3:45 min/km (Laufband 16,0-16,4 km/h, Lap-Taste bei 500 m) + 60-75 s Station zuegig (1. 250 m Ski, 2. 25 m Sled Push 152 kg, sonst 10 BBJ, 3. 20 m BBJ, 4. 250 m Row, 5. 25 m Lunges 20 kg, 6. 25 Wall Balls 6 kg) + 60 s Stand-Pause. RPE 7, Lauf-Pace sauber treffen, nicht schneller, Race-Gewichte. 10 min CD.",
+  "steps": [
+    {
+      "type": "warmup",
+      "duration_s": 600,
+      "exercise": "run_walk",
+      "note": "10 min easy WA"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "run",
+      "note": "R1 500 m 16,0-16,4 km/h bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R1 250 m Ski bis Lap"
+    },
+    {
+      "type": "rest",
+      "duration_s": 60,
+      "note": "R1 60 s Stand-Pause"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "run",
+      "note": "R2 500 m 16,0-16,4 km/h bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R2 25 m Sled Push 152 kg bis Lap",
+      "exercise": "sled_push"
+    },
+    {
+      "type": "rest",
+      "duration_s": 60,
+      "note": "R2 60 s Stand-Pause"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "run",
+      "note": "R3 500 m 16,0-16,4 km/h bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R3 20 m BBJ bis Lap",
+      "exercise": "burpee"
+    },
+    {
+      "type": "rest",
+      "duration_s": 60,
+      "note": "R3 60 s Stand-Pause"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "run",
+      "note": "R4 500 m 16,0-16,4 km/h bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R4 250 m Row bis Lap"
+    },
+    {
+      "type": "rest",
+      "duration_s": 60,
+      "note": "R4 60 s Stand-Pause"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "run",
+      "note": "R5 500 m 16,0-16,4 km/h bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R5 25 m Lunges 20 kg bis Lap",
+      "exercise": "lunge"
+    },
+    {
+      "type": "rest",
+      "duration_s": 60,
+      "note": "R5 60 s Stand-Pause"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "run",
+      "note": "R6 500 m 16,0-16,4 km/h bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "R6 25 Wall Balls 6 kg bis Lap",
+      "exercise": "wall_ball"
+    },
+    {
+      "type": "rest",
+      "duration_s": 60,
+      "note": "R6 60 s Stand-Pause"
+    },
+    {
+      "type": "cooldown",
+      "duration_s": 600,
+      "note": "10 min CD easy"
+    }
+  ]
+}
