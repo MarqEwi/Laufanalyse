@@ -1,57 +1,211 @@
 {
   "name": "Duo Generalprobe Solo 8 Runden",
   "sport": "cardio",
-  "description": "Coach Engelhardt, Key Session Duo Generalprobe 1 Woche vor Hyrox HH (Men's Doubles Open mit Stefan), Solo-Variante nach Regel 'ohne Partner halbe Distanz zuegig + gleich lange Pause': 10 min einlaufen + Race-Warm-up (2-3 Steigerungen, BBJ, WB). 8x 500 m Run @ 3:40-3:45 min/km + eigener Stationsanteil in Teilstuecken mit Pause so lang wie das Teilstueck: 1. Ski 4x125 m (Pause 30 s), 2. Sled Push 152 kg 2x12,5 m (20 s), 3. Sled Pull 103 kg 2x12,5 m (25 s), 4. BBJ 2x20 m (60 s), 5. Row 4x125 m (30 s), 6. Farmers 2x24 kg 2x50 m (25 s), 7. Lunges 20 kg 2x25 m (45 s), 8. Wall Balls 6 kg 5x10 (25 s). Pausenzeiten sind Schaetzwerte der Arbeitszeit, Wechsel ueben. RPE 7-8 kontrolliert, nicht all-out. 10 min CD.",
+  "description": "Coach Engelhardt, Key Session Duo Generalprobe 1 Woche vor Hyrox HH (Men's Doubles Open mit Stefan), Solo-Variante nach Regel 'ohne Partner halbe Distanz zuegig + gleich lange Pause': 10 min einlaufen + Race-Warm-up (2-3 Steigerungen, BBJ, WB). 8x 500 m Run @ 3:40-3:45 min/km + eigener Stationsanteil in Teilstuecken mit Pause so lang wie das Teilstueck: 1. Ski 4x125 m (Pause 30 s), 2. Sled Push 152 kg 2x12,5 m (20 s), 3. Sled Pull 103 kg 2x12,5 m (25 s), 4. BBJ 2x20 m (60 s), 5. Row 2x250 m (55 s), 6. Farmers 2x24 kg 2x50 m (25 s), 7. Lunges 20 kg 2x25 m (45 s), 8. Wall Balls 6 kg 5x10 (25 s). Pausenzeiten sind Schaetzwerte der Arbeitszeit, Wechsel ueben. RPE 7-8 kontrolliert, nicht all-out. 10 min CD.",
   "steps": [
-    {"type": "warmup", "duration_s": 600, "exercise": "run_walk", "note": "10 min einlaufen"},
-    {"type": "warmup", "end": "lap", "note": "Race-WA Steig+BBJ+WB bis Lap"},
-
-    {"type": "interval", "end": "lap", "exercise": "run", "note": "R1 500 m 3:40-3:45 bis Lap"},
-    {"repeat": 3, "steps": [
-      {"type": "interval", "end": "lap", "note": "Ski 125 m zuegig bis Lap"},
-      {"type": "rest", "duration_s": 30, "note": "Pause 30 s (= 125 m Ski)"}
-    ]},
-    {"type": "interval", "end": "lap", "note": "Ski 125 m (4/4) bis Lap"},
-
-    {"type": "interval", "end": "lap", "exercise": "run", "note": "R2 500 m 3:40-3:45 bis Lap"},
-    {"type": "interval", "end": "lap", "exercise": "sled_push", "note": "Push 12,5 m 152 kg bis Lap"},
-    {"type": "rest", "duration_s": 20, "note": "Pause 20 s (= 1 Bahn Push)"},
-    {"type": "interval", "end": "lap", "exercise": "sled_push", "note": "Push 12,5 m (2/2) bis Lap"},
-
-    {"type": "interval", "end": "lap", "exercise": "run", "note": "R3 500 m 3:40-3:45 bis Lap"},
-    {"type": "interval", "end": "lap", "exercise": "sled_pull", "note": "Pull 12,5 m 103 kg bis Lap"},
-    {"type": "rest", "duration_s": 25, "note": "Pause 25 s (= 1 Bahn Pull)"},
-    {"type": "interval", "end": "lap", "exercise": "sled_pull", "note": "Pull 12,5 m (2/2) bis Lap"},
-
-    {"type": "interval", "end": "lap", "exercise": "run", "note": "R4 500 m 3:40-3:45 bis Lap"},
-    {"type": "interval", "end": "lap", "exercise": "burpee", "note": "BBJ 20 m bis Lap"},
-    {"type": "rest", "duration_s": 60, "note": "Pause 60 s (= 20 m BBJ)"},
-    {"type": "interval", "end": "lap", "exercise": "burpee", "note": "BBJ 20 m (2/2) bis Lap"},
-
-    {"type": "interval", "end": "lap", "exercise": "run", "note": "R5 500 m 3:40-3:45 bis Lap"},
-    {"repeat": 3, "steps": [
-      {"type": "interval", "end": "lap", "note": "Row 125 m zuegig bis Lap"},
-      {"type": "rest", "duration_s": 30, "note": "Pause 30 s (= 125 m Row)"}
-    ]},
-    {"type": "interval", "end": "lap", "note": "Row 125 m (4/4) bis Lap"},
-
-    {"type": "interval", "end": "lap", "exercise": "run", "note": "R6 500 m 3:40-3:45 bis Lap"},
-    {"type": "interval", "end": "lap", "note": "Carry 50 m 2x24 kg bis Lap"},
-    {"type": "rest", "duration_s": 25, "note": "Pause 25 s (= 50 m Carry)"},
-    {"type": "interval", "end": "lap", "note": "Carry 50 m (2/2) bis Lap"},
-
-    {"type": "interval", "end": "lap", "exercise": "run", "note": "R7 500 m 3:40-3:45 bis Lap"},
-    {"type": "interval", "end": "lap", "exercise": "lunge", "note": "Lunges 25 m 20 kg bis Lap"},
-    {"type": "rest", "duration_s": 45, "note": "Pause 45 s (= 25 m Lunges)"},
-    {"type": "interval", "end": "lap", "exercise": "lunge", "note": "Lunges 25 m (2/2) bis Lap"},
-
-    {"type": "interval", "end": "lap", "exercise": "run", "note": "R8 500 m 3:40-3:45 bis Lap"},
-    {"repeat": 4, "steps": [
-      {"type": "interval", "end": "lap", "exercise": "wall_ball", "note": "10 WB 6 kg bis Lap"},
-      {"type": "rest", "duration_s": 25, "note": "Pause 25 s (= 10 WB)"}
-    ]},
-    {"type": "interval", "end": "lap", "exercise": "wall_ball", "note": "10 WB (5/5) bis Lap"},
-
-    {"type": "cooldown", "duration_s": 600, "note": "10 min CD easy"}
+    {
+      "type": "warmup",
+      "duration_s": 600,
+      "exercise": "run_walk",
+      "note": "10 min einlaufen"
+    },
+    {
+      "type": "warmup",
+      "end": "lap",
+      "note": "Race-WA Steig+BBJ+WB bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "run",
+      "note": "R1 500 m 3:40-3:45 bis Lap"
+    },
+    {
+      "repeat": 3,
+      "steps": [
+        {
+          "type": "interval",
+          "end": "lap",
+          "note": "Ski 125 m zuegig bis Lap"
+        },
+        {
+          "type": "rest",
+          "duration_s": 30,
+          "note": "Pause 30 s (= 125 m Ski)"
+        }
+      ]
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "Ski 125 m (4/4) bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "run",
+      "note": "R2 500 m 3:40-3:45 bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "sled_push",
+      "note": "Push 12,5 m 152 kg bis Lap"
+    },
+    {
+      "type": "rest",
+      "duration_s": 20,
+      "note": "Pause 20 s (= 1 Bahn Push)"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "sled_push",
+      "note": "Push 12,5 m (2/2) bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "run",
+      "note": "R3 500 m 3:40-3:45 bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "sled_pull",
+      "note": "Pull 12,5 m 103 kg bis Lap"
+    },
+    {
+      "type": "rest",
+      "duration_s": 25,
+      "note": "Pause 25 s (= 1 Bahn Pull)"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "sled_pull",
+      "note": "Pull 12,5 m (2/2) bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "run",
+      "note": "R4 500 m 3:40-3:45 bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "burpee",
+      "note": "BBJ 20 m bis Lap"
+    },
+    {
+      "type": "rest",
+      "duration_s": 60,
+      "note": "Pause 60 s (= 20 m BBJ)"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "burpee",
+      "note": "BBJ 20 m (2/2) bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "run",
+      "note": "R5 500 m 3:40-3:45 bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "Row 250 m zuegig bis Lap"
+    },
+    {
+      "type": "rest",
+      "duration_s": 55,
+      "note": "Pause 55 s (= 250 m Row)"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "Row 250 m (2/2) bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "run",
+      "note": "R6 500 m 3:40-3:45 bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "Carry 50 m 2x24 kg bis Lap"
+    },
+    {
+      "type": "rest",
+      "duration_s": 25,
+      "note": "Pause 25 s (= 50 m Carry)"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "note": "Carry 50 m (2/2) bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "run",
+      "note": "R7 500 m 3:40-3:45 bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "lunge",
+      "note": "Lunges 25 m 20 kg bis Lap"
+    },
+    {
+      "type": "rest",
+      "duration_s": 45,
+      "note": "Pause 45 s (= 25 m Lunges)"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "lunge",
+      "note": "Lunges 25 m (2/2) bis Lap"
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "run",
+      "note": "R8 500 m 3:40-3:45 bis Lap"
+    },
+    {
+      "repeat": 4,
+      "steps": [
+        {
+          "type": "interval",
+          "end": "lap",
+          "exercise": "wall_ball",
+          "note": "10 WB 6 kg bis Lap"
+        },
+        {
+          "type": "rest",
+          "duration_s": 25,
+          "note": "Pause 25 s (= 10 WB)"
+        }
+      ]
+    },
+    {
+      "type": "interval",
+      "end": "lap",
+      "exercise": "wall_ball",
+      "note": "10 WB (5/5) bis Lap"
+    },
+    {
+      "type": "cooldown",
+      "duration_s": 600,
+      "note": "10 min CD easy"
+    }
   ]
 }
