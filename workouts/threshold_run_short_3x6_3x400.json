@@ -1,0 +1,17 @@
+{
+  "name": "Threshold Run Short 3x6 + 3x400",
+  "sport": "running",
+  "description": "Coach Engelhardt 27.10.2026, Rennwoche, kurzer Schwellenreiz, frisch bleiben: 10 min easy WA, 3x 6 min RPE 7 (4:15-4:25 min/km) mit 90 s easy, dann 3x 400 m @ 3:40 min/km (Doubles-Racepace HH) mit 90 s easy, 10 min CD. For Completion.",
+  "steps": [
+    {"type": "warmup",   "duration_s": 600, "note": "10 min easy einlaufen"},
+    {"repeat": 3, "steps": [
+      {"type": "interval", "duration_s": 360, "target": {"pace_min_km": ["4:15", "4:25"]}, "note": "6 min Schwelle RPE 7"},
+      {"type": "recovery", "duration_s": 90, "note": "90 s easy traben"}
+    ]},
+    {"repeat": 3, "steps": [
+      {"type": "interval", "distance_m": 400, "target": {"pace_min_km": ["3:35", "3:45"]}, "note": "400 m Racepace 3:40"},
+      {"type": "recovery", "duration_s": 90, "note": "90 s easy traben"}
+    ]},
+    {"type": "cooldown", "duration_s": 600, "target": {"pace_min_km": ["5:31", "6:30"]}, "note": "10 min Z1 auslaufen"}
+  ]
+}
