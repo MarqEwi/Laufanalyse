@@ -1,0 +1,18 @@
+{
+  "name": "Race Activation 3x500 + Station",
+  "sport": "cardio",
+  "description": "Coach Engelhardt 29.10.2026, Race Activation am Tag vor Hyrox HH, nur antippen, frisch bleiben: 10 min einlaufen, 3x (500 m Run @ Doubles-Racepace 3:40-3:45 min/km + 1 Station kurz: R1 250 m Row, R2 10 BBJ, R3 15 Wall Balls 6 kg, dann 2 min easy), RPE 6-7, 10 min CD. For Completion.",
+  "steps": [
+    {"type": "warmup", "duration_s": 600, "exercise": "run_walk", "note": "10 min einlaufen"},
+    {"type": "interval", "end": "lap", "exercise": "run", "note": "R1 500 m 3:40-3:45 bis Lap"},
+    {"type": "interval", "end": "lap", "note": "R1 Row 250 m bis Lap"},
+    {"type": "recovery", "duration_s": 120, "note": "2 min easy"},
+    {"type": "interval", "end": "lap", "exercise": "run", "note": "R2 500 m 3:40-3:45 bis Lap"},
+    {"type": "interval", "end": "lap", "exercise": "burpee", "note": "R2 10 BBJ bis Lap"},
+    {"type": "recovery", "duration_s": 120, "note": "2 min easy"},
+    {"type": "interval", "end": "lap", "exercise": "run", "note": "R3 500 m 3:40-3:45 bis Lap"},
+    {"type": "interval", "end": "lap", "exercise": "wall_ball", "note": "R3 15 WB 6 kg bis Lap"},
+    {"type": "recovery", "duration_s": 120, "note": "2 min easy"},
+    {"type": "cooldown", "duration_s": 600, "note": "10 min CD easy"}
+  ]
+}
